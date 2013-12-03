@@ -1,5 +1,6 @@
 require 'sinatra/base'
 require 'sinatra/reloader' if     Sinatra::Base.development?
+require 'pry'              unless Sinatra::Base.production?
 
 require 'active_model'
 require 'virtus'
