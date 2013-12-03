@@ -10,6 +10,7 @@ require 'shoulda/context'
 require 'turn'
 require 'mocha/setup'
 require 'vcr'
+require 'pry'
 
 require 'rack/test'
 
