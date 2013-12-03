@@ -28,6 +28,21 @@ module Pickwick
                                 write: { type: "boolean" }
                               },
                               default: Permission.new
+
+        def self.find_by_token(token)
+          query = Jbuilder.encode do |json|
+            json.query do
+              json.match do
+                json.token do
+                  json.query token
+                end
+              end
+            end
+          end
+
+          self.search(query).records.first
+        end
+
       end
     end
   end
