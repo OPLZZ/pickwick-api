@@ -6,6 +6,8 @@ require 'elasticsearch/model'
 
 require 'pickwick/elasticsearch/model/persistence'
 require 'pickwick/elasticsearch/model/adapters/persistence'
+
+require 'pickwick/api/models/consumer'
 require "pickwick/api/application"
 
 require "pickwick/api/version"
