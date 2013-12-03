@@ -1,8 +1,10 @@
-require "sinatra/base"
+require 'sinatra/base'
 
-require "pickwick/api/models/consumer"
-require "pickwick/api/models/job"
+require 'active_model'
+require 'virtus'
+require 'elasticsearch/model'
 
+require 'pickwick/elasticsearch/model/persistence'
 require "pickwick/api/application"
 
 require "pickwick/api/version"
