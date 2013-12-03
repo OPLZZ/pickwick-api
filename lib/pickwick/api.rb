@@ -1,4 +1,5 @@
 require 'sinatra/base'
+require 'sinatra/reloader' if     Sinatra::Base.development?
 
 require 'active_model'
 require 'virtus'
