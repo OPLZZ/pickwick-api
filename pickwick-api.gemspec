@@ -22,6 +22,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "rdiscount"
   spec.add_dependency "virtus"
   spec.add_dependency "activemodel", "~> 4"
+  spec.add_dependency "jbuilder"
 
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rake"
