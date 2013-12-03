@@ -8,6 +8,11 @@ module Pickwick
         enable   :dump_errors
         register Sinatra::Reloader
       end
+
+      get "/" do
+        erb :readme
+      end
+
     end
   end
 end

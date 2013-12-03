@@ -1,4 +1,5 @@
 require 'sinatra/base'
+require 'rdiscount'
 require 'sinatra/reloader' if     Sinatra::Base.development?
 require 'pry'              unless Sinatra::Base.production?
 
@@ -16,5 +17,10 @@ require "pickwick/api/version"
 
 module Pickwick
   module API
+    REVISION = `git --git-dir="#{File.dirname(__FILE__)}/../../.git" log -1 --pretty=%h`.strip rescue 'N/A'
+
+    def self.revision
+      REVISION
+    end
   end
 end
