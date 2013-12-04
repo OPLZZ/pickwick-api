@@ -1,6 +1,5 @@
 require 'sinatra/base'
 require 'rdiscount'
-require 'sinatra/reloader' if     Sinatra::Base.development?
 require 'pry'              unless Sinatra::Base.production?
 
 require 'active_model'

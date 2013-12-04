@@ -6,7 +6,6 @@ module Pickwick
 
       configure :development do
         enable   :dump_errors
-        register Sinatra::Reloader
       end
 
       get "/" do
