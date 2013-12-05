@@ -52,6 +52,11 @@ module Elasticsearch
         def delete_elasticsearch_index
           __elasticsearch__.client.indices.delete index: self.index_name
         end
+
+        def refresh_elasticsearch_index
+          __elasticsearch__.client.indices.refresh index: self.index_name
+        end
+
         def __get_virtus_options(options)
           options.slice(*Virtus::Attribute.accepted_options)
         end

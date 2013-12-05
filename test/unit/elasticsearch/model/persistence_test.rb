@@ -124,6 +124,16 @@ class ElasticsearchModelPersistenceTest < Test::Unit::TestCase
       assert_equal response, Article.delete_elasticsearch_index
     end
 
+    should "be able to refresh model index" do
+      response = {"ok"=>true, "_shards"=>{"total"=>2, "successful"=>1, "failed"=>0}}
+
+      Elasticsearch::API::Indices::IndicesClient.any_instance.expects(:refresh).with do |arguments|
+        assert_equal "articles", arguments[:index]
+      end.returns(response)
+
+      assert_equal response, Article.refresh_elasticsearch_index
+    end
+
   end
 
   context "Model defaults" do
