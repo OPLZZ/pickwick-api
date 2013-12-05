@@ -12,7 +12,9 @@ module Pickwick
       class Consumer
         include Elasticsearch::Model::Persistence
 
-        index_name "pickwick-api-consumers"
+        index_name 'pickwick-api-consumers'
+
+        settings index: { number_of_shards: 1 }
 
         property :name, String
 
@@ -24,8 +26,8 @@ module Pickwick
 
         property :permission, Permission,
                               properties: {
-                                read:  { type: "boolean" },
-                                write: { type: "boolean" }
+                                read:  { type: 'boolean' },
+                                write: { type: 'boolean' }
                               },
                               default: Permission.new
 
