@@ -7,6 +7,9 @@ module Pickwick
 
       helpers Helpers::RespondWith
 
+      configure do
+        mime_type :jsld, 'application/ld+json'
+      end
 
       configure :development do
         enable :dump_errors
