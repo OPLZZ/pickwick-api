@@ -1,6 +1,7 @@
 require 'sinatra/base'
+
 require 'rdiscount'
-require 'pry'              unless Sinatra::Base.production?
+require 'pry' unless Sinatra::Base.production?
 
 require 'active_model'
 require 'virtus'
@@ -9,6 +10,8 @@ require 'jbuilder'
 
 require 'pickwick/elasticsearch/model/persistence'
 require 'pickwick/elasticsearch/model/adapters/persistence'
+
+require 'pickwick/api/helpers/respond_with'
 
 require 'pickwick/api/models/consumer'
 require "pickwick/api/application"
