@@ -18,7 +18,9 @@ FactoryGirl.define do
 
     factory :search_and_store_consumer do
       permission Permission.new search: true, store: true
-    end    
+    end
+
+    to_create { |instance| instance.save }
 
   end
 

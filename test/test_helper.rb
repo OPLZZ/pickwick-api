@@ -19,7 +19,7 @@ require 'pickwick-api'
 require 'factory_girl'
 Dir[File.dirname(__FILE__)+"/factories/*.rb"].each {|file| require file }
 
-class Test::Unit::TestCase
+class IntegrationTestCase < Test::Unit::TestCase
   include Rack::Test::Methods
 
   alias response last_response
@@ -29,10 +29,21 @@ class Test::Unit::TestCase
   end
 
   def setup
+    super
+
+    Consumer.index_name 'consumers_test'
+    Consumer.__elasticsearch__.create_index!
   end
 
   def teardown
+    super
+
+    Consumer.__elasticsearch__.delete_index!
   end
+
+end
+
+class Test::Unit::TestCase
 
   def json(json)
     MultiJson.load(json)

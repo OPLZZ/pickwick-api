@@ -15,6 +15,14 @@ module Pickwick
       configure :development do
         enable :dump_errors
       end
+
+      set(:permission) do |permission|
+        condition do
+          @consumer = Consumer.find_by_token(params[:token]) unless params[:token].blank?
+          access_denied if @consumer.nil? || !@consumer.permission.send(permission)
+        end
+      end
+
       get '/' do
         respond_with do
           html { erb  :readme }
@@ -22,6 +30,11 @@ module Pickwick
         end
       end
 
+      register Store
+
+      private
+      def access_denied
+        halt 401, json(error: 'Access denied')
       end
 
     end
