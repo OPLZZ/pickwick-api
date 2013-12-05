@@ -22,6 +22,8 @@ Dir[File.dirname(__FILE__)+"/factories/*.rb"].each {|file| require file }
 class Test::Unit::TestCase
   include Rack::Test::Methods
 
+  alias response last_response
+
   def app
     Pickwick::API::Application
   end
@@ -30,6 +32,10 @@ class Test::Unit::TestCase
   end
 
   def teardown
+  end
+
+  def json(json)
+    MultiJson.load(json)
   end
 
 end

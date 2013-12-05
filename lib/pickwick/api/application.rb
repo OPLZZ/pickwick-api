@@ -6,6 +6,7 @@ module Pickwick
       enable :logging
 
       helpers Helpers::RespondWith
+      helpers Helpers::Common
 
       configure do
         mime_type :jsld, 'application/ld+json'

@@ -12,6 +12,7 @@ require 'pickwick/elasticsearch/model/persistence'
 require 'pickwick/elasticsearch/model/adapters/persistence'
 
 require 'pickwick/api/helpers/respond_with'
+require 'pickwick/api/helpers/common'
 
 require 'pickwick/api/models/consumer'
 require "pickwick/api/application"
