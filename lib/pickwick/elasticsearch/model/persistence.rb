@@ -41,20 +41,6 @@ module Elasticsearch
           new(attributes).save
         end
 
-        def create_elasticsearch_index
-          __elasticsearch__.client.indices.create index: self.index_name,
-                                                  body:  {
-                                                    settings: __elasticsearch__.settings.to_hash,
-                                                    mappings: __elasticsearch__.mappings.to_hash
-                                                  }
-        end
-
-        def delete_elasticsearch_index
-          __elasticsearch__.client.indices.delete index: self.index_name
-        end
-
-        def refresh_elasticsearch_index
-          __elasticsearch__.client.indices.refresh index: self.index_name
         end
 
         def __get_virtus_options(options)
