@@ -14,6 +14,8 @@ end
 class Article
   include Elasticsearch::Model::Persistence
 
+  settings index: { number_of_shards: 1 }
+
   property :name, String, analyzer: 'snowball'
   property :meta,  Meta
   property :blank, Boolean,  default: true
@@ -95,6 +97,31 @@ class ElasticsearchModelPersistenceTest < Test::Unit::TestCase
 
     should "be able to overwrite detected type" do
       assert_equal 'long',  Article.mappings.to_hash[:article][:properties][:views][:type]
+    end
+
+    should "be able to create index with proper settings and mapping" do
+      response = {"ok"=>true, "acknowledged"=>true}
+
+      Elasticsearch::API::Indices::IndicesClient.any_instance.expects(:create).with do |arguments|
+        assert_equal "articles",     arguments[:index]
+        assert_equal "not_analyzed", arguments[:body][:mappings][:article][:properties][:tags][:index]
+        assert_equal "object",       arguments[:body][:mappings][:article][:properties][:meta][:type]
+        assert_equal "snowball",     arguments[:body][:mappings][:article][:properties][:name][:analyzer]
+
+        assert_equal 1,              arguments[:body][:settings][:index][:number_of_shards]
+      end.returns(response)
+
+      assert_equal response, Article.create_elasticsearch_index
+    end
+
+    should "be able to delete model index" do
+      response = {"ok"=>true, "acknowledged"=>true}
+
+      Elasticsearch::API::Indices::IndicesClient.any_instance.expects(:delete).with do |arguments|
+        assert_equal "articles", arguments[:index]
+      end.returns(response)
+
+      assert_equal response, Article.delete_elasticsearch_index
     end
 
   end
