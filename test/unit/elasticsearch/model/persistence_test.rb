@@ -16,6 +16,8 @@ class Article
 
   settings index: { number_of_shards: 1 }
 
+  validates_presence_of :name
+
   property :name, String, analyzer: 'snowball'
   property :meta,  Meta
   property :blank, Boolean,  default: true
@@ -166,6 +168,16 @@ class ElasticsearchModelPersistenceTest < Test::Unit::TestCase
       assert_equal 123, article.id
       assert_equal 1,   article.version
       assert article.persisted?
+    end
+
+    should "not persist invalid document" do
+      @elasticsearch_proxy.expects(:index_document).never
+      Article.any_instance.stubs(:__elasticsearch__).returns(@elasticsearch_proxy)
+
+      article = Article.new
+
+      assert ! article.save
+      assert ! Article.create(blank: false)
     end
 
   end

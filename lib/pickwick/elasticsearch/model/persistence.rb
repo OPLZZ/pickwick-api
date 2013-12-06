@@ -72,6 +72,7 @@ module Elasticsearch
         attr_accessor :id, :version, :persisted
 
         def save
+          return false unless valid?
           run_callbacks :save do
             unless persisted?
               run_callbacks :create do
