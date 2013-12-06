@@ -23,6 +23,15 @@ module Pickwick
           assert_not_nil json(response.body)["revision"]
         end
 
+        should "respond with 406 status code if unknown mime type is requested" do
+          header "ACCEPT", "uknown"
+
+          get '/'
+
+          assert_equal 406, response.status
+          assert_equal "Not Acceptable", response.body
+        end
+
       end
 
       context "Store" do

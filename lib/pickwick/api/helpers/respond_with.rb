@@ -22,7 +22,7 @@ module Pickwick
 
           def perform
             mime_type = __get_mime_type
-            type      = mime_type.split(/\s*;\s*/, 2).first
+            type      = mime_type.split(/\s*;\s*/, 2).first rescue nil
 
             if block = @registered_mime_types[type]
               @app.content_type mime_type
@@ -36,8 +36,7 @@ module Pickwick
 
           def __get_mime_type
             mime_type = @app.content_type             ||
-                        @app.request.preferred_type   ||
-                        @default_type
+                        @app.request.preferred_type
 
             mime_type = @default_mime_type if mime_type.to_s == '*/*'
             mime_type
