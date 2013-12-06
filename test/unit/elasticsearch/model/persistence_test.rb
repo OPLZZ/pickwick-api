@@ -1,6 +1,13 @@
 require 'test_helper'
 require 'pry'
 
+class Publisher
+  include Elasticsearch::Model::Persistence
+
+  property :name,     String, analyzer: 'snowball'
+  property :location, [Float], type: 'geo_point', default: []
+end
+
 class Item
   include Virtus.model
   attribute :name, String
@@ -18,14 +25,15 @@ class Article
 
   validates_presence_of :name
 
-  property :name, String, analyzer: 'snowball'
-  property :meta,  Meta
-  property :blank, Boolean,  default: true
-  property :tags,  [String], index: 'not_analyzed', default: []
-  property :items, [Item],   index: 'not_analyzed', default: []
-  property :downloads, Integer, default: 0
-  property :views,     Integer, default: 0, type: 'long'
-  property :created_at, Time, default: lambda { |article, attribute| Time.now.utc }
+  property :name,       String,    analyzer: 'snowball'
+  property :publisher,  Publisher, default: Publisher.new
+  property :meta,       Meta
+  property :blank,      Boolean,   default: true
+  property :tags,       [String],  index: 'not_analyzed', default: []
+  property :items,      [Item],    index: 'not_analyzed', default: []
+  property :downloads,  Integer,   default: 0
+  property :views,      Integer,   default: 0, type: 'long'
+  property :created_at, Time,      default: lambda { |article, attribute| Time.now.utc }
 end
 
 class ActiveModelLint < ActiveSupport::TestCase
@@ -101,6 +109,13 @@ class ElasticsearchModelPersistenceTest < Test::Unit::TestCase
       assert_equal 'long',  Article.mappings.to_hash[:article][:properties][:views][:type]
     end
 
+    should "get mapping from nested model" do
+      mappings = Article.mappings.to_hash
+
+      assert_equal( {analyzer: "snowball", type: "string"}, mappings[:article][:properties][:publisher][:properties][:name] )
+      assert_equal( {type: 'geo_point'}, mappings[:article][:properties][:publisher][:properties][:location] )
+    end
+
   end
 
   context "Model defaults" do
@@ -110,6 +125,9 @@ class ElasticsearchModelPersistenceTest < Test::Unit::TestCase
       assert_equal 0, article.downloads
       assert_equal [], article.items
       assert_kind_of Time, article.created_at
+
+      assert_kind_of Publisher, article.publisher
+      assert_equal [], article.publisher.location
     end
 
   end

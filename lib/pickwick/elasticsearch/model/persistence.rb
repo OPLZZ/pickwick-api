@@ -32,7 +32,7 @@ module Elasticsearch
           attribute(name, type, __get_virtus_options(options))
           # Set elasticsearch mapping
           #
-          __elasticsearch__.mapping.indexes(name.to_sym, __get_elasticsearch_options(type, options))
+          __elasticsearch__.mapping.indexes(name.to_sym, __get_elasticsearch_options(name, type, options))
 
           self
         end
@@ -41,15 +41,27 @@ module Elasticsearch
           new(attributes).save
         end
 
-        end
+        # TODO: Allow to find multiple ids
+        #
+        # def find(id)
+        #   response = __elasticsearch__.client.get(index: self.index_name, id: id) rescue nil
+
+        #   self.new(response["_source"].merge("id"        => response["_id"],
+        #                                      "version"   => response["_version"],
+        #                                      "persisted" => true)) if response
+        # end
 
         def __get_virtus_options(options)
           options.slice(*Virtus::Attribute.accepted_options)
         end
 
-        def __get_elasticsearch_options(type, options)  
-          options          = options.except(*Virtus::Attribute.accepted_options)
-          options[:type] ||= __get_elasticsearch_type(type)
+        def __get_elasticsearch_options(name, type, options)
+          options              = options.except(*Virtus::Attribute.accepted_options)
+          options[:type]     ||= __get_elasticsearch_type(type)
+
+          nested_properties    = type.mapping.to_hash[name][:properties] if type.respond_to?(:mappings) rescue nil
+          options[:properties] = nested_properties.deep_merge(options[:properties] || {}) if nested_properties
+
           options
         end
 
