@@ -17,6 +17,7 @@ require 'rack/test'
 require 'pickwick-api'
 
 require 'factory_girl'
+require 'faker'
 Dir[File.dirname(__FILE__)+"/factories/*.rb"].each {|file| require file }
 
 class IntegrationTestCase < Test::Unit::TestCase

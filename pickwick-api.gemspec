@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "activemodel", "~> 4"
   spec.add_dependency "jbuilder"
   spec.add_dependency "oj"
+  spec.add_dependency "ruby-duration"
 
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rake"
@@ -34,6 +35,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "shoulda-context"
   spec.add_development_dependency "turn"
   spec.add_development_dependency "factory_girl"
+  spec.add_development_dependency "faker"
   spec.add_development_dependency "mocha"
   spec.add_development_dependency "vcr"
   spec.add_development_dependency "simplecov"

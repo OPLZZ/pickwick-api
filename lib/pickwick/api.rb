@@ -7,6 +7,7 @@ require 'active_model'
 require 'virtus'
 require 'elasticsearch/model'
 require 'jbuilder'
+require 'ruby-duration'
 
 require 'pickwick/elasticsearch/model/persistence'
 require 'pickwick/elasticsearch/model/adapters/persistence'
