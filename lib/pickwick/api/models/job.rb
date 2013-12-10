@@ -102,11 +102,11 @@ module Pickwick
         property :id,               String, accessor: :private, analyzer: 'keyword'
         property :title,            String
         property :description,      String
-        property :industry,         String, index: 'not_analyzed'
+        property :industry,         String, analyzer: 'keyword'
         property :responsibilities, String
 
         property :vacancies,        Integer
-        property :employment_type,  String,  index: 'not_analyzed'
+        property :employment_type,  String,  analyzer: 'keyword'
         property :remote,           Boolean, default: false
 
         property :location,         Location
