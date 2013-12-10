@@ -41,6 +41,12 @@ class Article
   end
 end
 
+class User
+  include Elasticsearch::Model::Persistence
+
+  property :id, String, writer: :private
+end
+
 class ActiveModelLint < ActiveSupport::TestCase
   include ActiveModel::Lint::Tests
 
@@ -153,6 +159,14 @@ class ElasticsearchModelPersistenceTest < Test::Unit::TestCase
     should "not set private attributes" do
       article = Article.new id: '123', name: 'Test'
       assert_nil article.id
+    end
+
+    should "raise exception if no setter is available for private property" do
+      User.__elasticsearch__.client
+                                 .expects(:mget)
+                                 .returns("docs" => [ { "exists" => true, "_id" => "123", "_source" => {} } ])
+
+      assert_raise(NoMethodError) { User.find("123") }
     end
 
   end
