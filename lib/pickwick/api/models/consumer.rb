@@ -12,9 +12,13 @@ module Pickwick
       class Consumer
         include Elasticsearch::Model::Persistence
 
+        # TODO: add application `region` somehow
+        #
         index_name 'pickwick-api-consumers'
 
         settings index: { number_of_shards: 1 }
+
+        property :id, String
 
         property :name, String
 
