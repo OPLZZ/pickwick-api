@@ -123,7 +123,8 @@ module Pickwick
 
         validates_presence_of :title,
                               :description,
-                              :contact
+                              :contact,
+                              :location
 
         validates :employment_type, inclusion: { in: TYPES }, allow_nil: true
 
