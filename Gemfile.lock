@@ -1,6 +1,6 @@
 GIT
   remote: git@github.com:karmi/elasticsearch-rails.git
-  revision: 078b67333aa1cbe62fadab05ad5e1614aa6e10ea
+  revision: 6d994462cb41b142ee784c6be4d3e2cceae5c05d
   specs:
     elasticsearch-model (0.0.0)
       elasticsearch (~> 0.4)
@@ -43,12 +43,12 @@ GEM
       descendants_tracker (~> 0.0.1)
     descendants_tracker (0.0.3)
     docile (1.1.1)
-    elasticsearch (0.4.1)
-      elasticsearch-api (= 0.4.1)
-      elasticsearch-transport (= 0.4.1)
-    elasticsearch-api (0.4.1)
+    elasticsearch (0.4.3)
+      elasticsearch-api (= 0.4.3)
+      elasticsearch-transport (= 0.4.3)
+    elasticsearch-api (0.4.3)
       multi_json
-    elasticsearch-transport (0.4.1)
+    elasticsearch-transport (0.4.3)
       faraday
       multi_json
     equalizer (0.0.8)
