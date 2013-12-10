@@ -127,8 +127,8 @@ module Pickwick
         validates :employment_type, inclusion: { in: TYPES }, allow_nil: true
 
         validate do
-          [:experience, :compensation, :contact].each do |property|
-            errors.add property, self.send(property).errors.messages if self.send(property) && !self.send(property).valid?
+          attributes.each do |attribute, value|
+            errors.add attribute, value.errors.messages if value && value.respond_to?(:valid?) && !value.valid?
           end
         end
 
