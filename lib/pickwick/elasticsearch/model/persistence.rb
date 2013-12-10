@@ -28,6 +28,21 @@ module Elasticsearch
 
       module ClassMethods
 
+        def initialize_from_response(response)
+          _source  = response.delete "_source"
+          instance = self.new _source.merge(response)
+
+          self.attribute_set.select { |a| a.options[:writer] == :private }.each do |attribute|
+            instance.__set_property(attribute.name, _source[attribute.name.to_s])
+          end
+
+          instance.__set_property(:id,        response["_id"])
+          instance.__set_property(:version,   response["_version"])
+          instance.__set_property(:persisted, true)
+
+          instance
+        end
+
         def property(name, type = nil, options = {})
 
           # Create attributes using Virtus
@@ -44,15 +59,14 @@ module Elasticsearch
           new(attributes).save
         end
 
-        # TODO: Allow to find multiple ids
-        #
-        # def find(id)
-        #   response = __elasticsearch__.client.get(index: self.index_name, id: id) rescue nil
+        def find(*ids)
+          docs     = Array(ids).map { |id| { _index: self.index_name, _id: id, _type: self.document_type } }
+          response = __elasticsearch__.client.mget body: { docs: docs }
 
-        #   self.new(response["_source"].merge("id"        => response["_id"],
-        #                                      "version"   => response["_version"],
-        #                                      "persisted" => true)) if response
-        # end
+          response["docs"].map do |doc|
+            self.initialize_from_response(doc) if doc["exists"]
+          end.compact
+        end
 
         def __get_virtus_options(options)
           options.slice(*Virtus::Attribute.accepted_options)

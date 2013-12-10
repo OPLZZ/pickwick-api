@@ -193,6 +193,27 @@ class ElasticsearchModelPersistenceTest < Test::Unit::TestCase
 
   end
 
+  context "Class" do
+
+    should "be able to find documents by their ids" do
+      Article.__elasticsearch__.client.expects(:mget).with do |arguments|
+        assert_equal "articles", arguments[:body][:docs].first[:_index]
+        assert_equal "article",  arguments[:body][:docs].first[:_type]
+        assert_equal "123",      arguments[:body][:docs].first[:_id]
+        assert_equal "456",      arguments[:body][:docs].last[:_id]
+      end.returns("docs" => [ { "exists" => true, "_id" => "123", "_source" => { "name" => "Test", "publisher" => { "name" => "Publisher" } } },
+                              { "exists" => false, "_id" => "456" } ])
+
+      articles = Article.find("123", "456")
+
+      assert_equal 1,           articles.size
+      assert_equal "Test",      articles.first.name
+      assert_equal "123",       articles.first.id
+      assert_equal "Publisher", articles.first.publisher.name
+    end
+
+  end
+
   context "When persisting" do
 
     setup do
