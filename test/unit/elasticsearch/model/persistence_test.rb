@@ -25,6 +25,7 @@ class Article
 
   validates_presence_of :name
 
+  property :id,         String,    writer: :private
   property :name,       String,    analyzer: 'snowball'
   property :publisher,  Publisher, default: Publisher.new
   property :meta,       Meta
@@ -34,6 +35,10 @@ class Article
   property :downloads,  Integer,   default: 0
   property :views,      Integer,   default: 0, type: 'long'
   property :created_at, Time,      default: lambda { |article, attribute| Time.now.utc }
+
+  def set_id(id)
+    @id = id
+  end
 end
 
 class ActiveModelLint < ActiveSupport::TestCase
@@ -128,6 +133,26 @@ class ElasticsearchModelPersistenceTest < Test::Unit::TestCase
 
       assert_kind_of Publisher, article.publisher
       assert_equal [], article.publisher.location
+    end
+
+  end
+
+  context "When initializing" do
+
+    should "set defined attributes only" do
+      article = Article.new title: 'Title', name: 'Test'
+
+      assert_equal 'Test', article.name
+      assert_equal 'Test', article.attributes[:name]
+
+      assert_raise(NoMethodError) { article.title }
+      assert_nil article.attributes[:title]
+      assert ! article.as_indexed_json.include?('Title')
+    end
+
+    should "not set private attributes" do
+      article = Article.new id: '123', name: 'Test'
+      assert_nil article.id
     end
 
   end

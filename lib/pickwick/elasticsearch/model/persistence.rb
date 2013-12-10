@@ -2,6 +2,11 @@ module Elasticsearch
   module Model
 
     module Persistence
+
+      # NOTE: `Virtus::Attribute.accepted_options` doesn't return :writer and :reader options without following line.
+      #
+      Virtus::Attribute.accept_options :writer, :reader
+
       def self.included(base)
         base.class_eval do
           include ActiveModel::AttributeMethods
@@ -15,8 +20,6 @@ module Elasticsearch
 
           extend  ActiveModel::Callbacks
           define_model_callbacks :create, :save, :destroy
-
-          self.include_root_in_json = false
 
           extend  ClassMethods
           include InstanceMethods
@@ -81,7 +84,7 @@ module Elasticsearch
       end
 
       module InstanceMethods
-        attr_accessor :id, :version, :persisted
+        attr_accessor :version, :persisted
 
         def as_json(options = {})
           self.to_hash.as_json(options)
@@ -129,6 +132,19 @@ module Elasticsearch
 
         def persisted?
           !!@persisted && !destroyed?
+        end
+
+        def __set_property(property, value)
+          method = case
+                   when self.respond_to?("#{property}=".to_sym)
+                     "#{property}=".to_sym
+                   when self.respond_to?("set_#{property}".to_sym)
+                    "set_#{property}".to_sym
+                   else
+                     raise NoMethodError, "#{self.class} doesn't have setter method for #{property} attribute."
+                   end
+
+          self.send(method, value)
         end
 
       end

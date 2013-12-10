@@ -9,9 +9,19 @@ module Elasticsearch
 
         module Records
           def records
-            @results.results.map { |r| @klass.new(r._source.merge("id"        => r._id,
-                                                                  "version"   => (r._version rescue nil),
-                                                                  "persisted" => true)) }
+            @results.results.map do |r|
+              result      = r.to_hash
+              _source     = result.delete "_source"
+              instance    = @klass.new _source.merge(result).merge("persisted" => true)
+
+              instance.__set_property(:id, result["_id"])
+
+              @klass.attribute_set.select { |a| a.options[:writer] == :private }.each do |attribute|
+                instance.__set_property(attribute.name, _source[attribute.name.to_s])
+              end
+
+              instance
+            end
           end
         end
 
