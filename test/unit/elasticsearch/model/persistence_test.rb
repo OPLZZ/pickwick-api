@@ -145,6 +145,13 @@ class ElasticsearchModelPersistenceTest < Test::Unit::TestCase
       assert_equal '123',  @article.as_json["id"]
     end
 
+    should "return hash without `id` property when as_indexed_json method is called" do
+      @article.set_id '123'
+
+      assert_equal 'Test', @article.as_indexed_json["name"]
+      assert_nil @article.as_indexed_json["id"]
+    end
+
   end
 
   context "When persisting" do

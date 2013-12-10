@@ -87,6 +87,10 @@ module Elasticsearch
           self.to_hash.as_json(options)
         end
 
+        def as_indexed_json(options = {})
+          except  = Array(options[:except])
+          except |= [:id]
+          as_json(options.merge(except: except))
         end
 
         def save
