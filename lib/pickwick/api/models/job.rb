@@ -91,7 +91,7 @@ module Pickwick
         DEFAULT_EXPIRATION = 30.days
         TYPES              = ['full-time', 'part-time', 'contract', 'temporary', 'seasonal', 'internship']
 
-        before_save :set_id, :set_updated_at
+        before_save :set_updated_at
 
         # TODO: add application `region` somehow
         #
@@ -99,6 +99,7 @@ module Pickwick
 
         settings index: { number_of_shards: 1 }
 
+        property :id,               String, accessor: :private, analyzer: 'keyword'
         property :title,            String
         property :description,      String
         property :industry,         String, index: 'not_analyzed'
@@ -132,11 +133,15 @@ module Pickwick
           end
         end
 
-        private
-
-        def set_id
-          self.id ||= __computed_id
+        def id
+          @id ||= __computed_id
         end
+
+        def set_id(id)
+          @id = id
+        end
+
+        private
 
         def set_updated_at
           self.updated_at = Time.now.utc

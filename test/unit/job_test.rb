@@ -54,6 +54,15 @@ module Pickwick
 
         end
 
+        context "When creating" do
+
+          should "use generated id instead of passed one" do
+            job = Job.new(id: '123')
+            assert job.id != '123'
+          end
+
+        end
+
         context "Instance" do
 
           setup do
