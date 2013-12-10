@@ -83,6 +83,10 @@ module Elasticsearch
       module InstanceMethods
         attr_accessor :id, :version, :persisted
 
+        def as_indexed_json(options={})
+          self.to_json
+        end
+
         def save
           return false unless valid?
           run_callbacks :save do
