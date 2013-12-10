@@ -80,7 +80,7 @@ module Pickwick
         property :phone, String
 
         validate do
-          errors.add :base, "email or phone number required" unless email && phone
+          errors.add :base, "email or phone number required" unless email || phone
           errors.add :email, "email is invalid" if email.present? && !email.include?('@')
         end
       end

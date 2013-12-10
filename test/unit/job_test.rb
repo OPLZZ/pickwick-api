@@ -47,6 +47,9 @@ module Pickwick
 
             assert ! job.valid?
             assert_equal "email or phone number required", job.errors.messages[:contact].first[:base].first
+
+            job.contact.email = "email@example.com"
+            assert job.valid?
           end
 
         end
