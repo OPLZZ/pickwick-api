@@ -132,6 +132,21 @@ class ElasticsearchModelPersistenceTest < Test::Unit::TestCase
 
   end
 
+  context "Instance" do
+
+    setup do
+      @article = Article.new name: 'Test'
+    end
+
+    should "have as_json method" do
+      @article.set_id '123'
+
+      assert_equal 'Test', @article.as_json["name"]
+      assert_equal '123',  @article.as_json["id"]
+    end
+
+  end
+
   context "When persisting" do
 
     setup do

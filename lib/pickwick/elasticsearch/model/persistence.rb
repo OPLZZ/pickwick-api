@@ -83,8 +83,10 @@ module Elasticsearch
       module InstanceMethods
         attr_accessor :id, :version, :persisted
 
-        def as_indexed_json(options={})
-          self.to_json
+        def as_json(options = {})
+          self.to_hash.as_json(options)
+        end
+
         end
 
         def save
