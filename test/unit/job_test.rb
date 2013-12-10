@@ -30,6 +30,9 @@ module Pickwick
 
             assert ! job.valid?
             assert_equal "not in valid ISO 8601 format (http://en.wikipedia.org/wiki/ISO_8601#Durations)", job.errors.messages[:experience].first[:duration].first
+
+            job.experience.duration = "foobar"
+            assert ! job.valid?
           end
 
           should "have valid contact" do
