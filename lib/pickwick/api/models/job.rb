@@ -100,6 +100,7 @@ module Pickwick
         settings index: { number_of_shards: 1 }
 
         property :id,               String, accessor: :private, analyzer: 'keyword'
+        property :consumer_id,      String, writer: :private, analyzer: 'keyword'
         property :title,            String
         property :description,      String
         property :industry,         String, analyzer: 'keyword'
@@ -140,6 +141,10 @@ module Pickwick
 
         def set_id(id)
           @id = id
+        end
+
+        def set_consumer_id(consumer_id)
+          @consumer_id = consumer_id
         end
 
         private
