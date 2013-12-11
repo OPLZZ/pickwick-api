@@ -32,14 +32,17 @@ class IntegrationTestCase < Test::Unit::TestCase
   def setup
     super
 
-    Consumer.index_name 'consumers_test'
+    Consumer.index_name 'pickwick-api-consumers-test'
+    Job.index_name      'pickwick-api-jobs-test'
     Consumer.__elasticsearch__.create_index!
+    Job.__elasticsearch__.create_index!
   end
 
   def teardown
     super
 
     Consumer.__elasticsearch__.delete_index!
+    Job.__elasticsearch__.delete_index!
   end
 
 end
