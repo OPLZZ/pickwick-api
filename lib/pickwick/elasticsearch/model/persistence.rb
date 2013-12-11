@@ -60,7 +60,7 @@ module Elasticsearch
         end
 
         def find(*ids)
-          docs     = Array(ids).map { |id| { _index: self.index_name, _id: id, _type: self.document_type } }
+          docs     = Array(ids).flatten.map { |id| { _index: self.index_name, _id: id, _type: self.document_type } }
           response = __elasticsearch__.client.mget body: { docs: docs }
 
           response["docs"].map do |doc|
