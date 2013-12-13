@@ -219,8 +219,84 @@ module Pickwick
 
         end
 
-      end
+        context "Search" do
+          setup do
+            @store_consumer  = FactoryGirl.create(:store_consumer)
+            @search_consumer = FactoryGirl.create(:search_consumer)
 
+            Consumer.__elasticsearch__.refresh_index!
+          end
+
+          context "Credentials" do
+            should "deny access without valid token" do
+              get '/vacancies'
+
+              assert_equal 401, response.status
+              assert_equal "Access denied", json(response.body)[:error]
+            end
+
+            should "deny access for user without `store` permission" do
+              get '/vacancies', token: @store_consumer.token
+
+              assert_equal 401, response.status
+              assert_equal "Access denied", json(response.body)[:error]
+            end
+
+            should "allow access for user with proper permission" do
+              get '/vacancies', token: @search_consumer.token
+              assert response.ok?
+            end
+          end
+
+          context "Getting vacancy by id" do
+            setup do
+              @vacancy = FactoryGirl.create(:vacancy)
+              Vacancy.__elasticsearch__.refresh_index!
+            end
+
+            should "return vacancy by its id" do
+              get "/vacancies/#{@vacancy.id}", token: @search_consumer.token
+
+              r = json(response.body)
+
+              assert response.ok?
+              assert_equal @vacancy.id,    r[:vacancy][:id]
+              assert_equal @vacancy.title, r[:vacancy][:title]
+              assert_nil   r[:vacancy][:consumer_id]
+            end
+
+            should "return 'not found' error if vacancy not found by id" do
+              get "/vacancies/123", token: @search_consumer.token
+
+              r = json(response.body)
+
+              assert_equal 404,         response.status
+              assert_equal "Not found", r[:error]
+            end
+
+          end
+
+          context "Searching for vacancies" do
+            setup do
+              @vacancies = FactoryGirl.create_list(:vacancy, 10)
+              Vacancy.__elasticsearch__.refresh_index!
+            end
+
+            should "return array of vacancies" do
+              get "/vacancies", token: @search_consumer.token
+
+              r = json(response.body)
+
+              assert response.ok?
+              assert_equal 10, r[:vacancies].size
+              assert_not_nil r[:vacancies].first[:title]
+              assert_nil     r[:vacancies].first[:consumer_id]
+            end
+
+          end
+
+        end
+      end
     end
   end
 end

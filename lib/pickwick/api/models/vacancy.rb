@@ -66,6 +66,10 @@ module Pickwick
           @consumer_id = consumer_id
         end
 
+        def public_properties
+          {id: id}.merge(as_json(except: [:consumer_id]))
+        end
+
         private
 
         def set_updated_at

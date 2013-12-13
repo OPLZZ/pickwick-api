@@ -25,11 +25,12 @@ require 'pickwick/api/models/compensation'
 require 'pickwick/api/models/contact'
 require 'pickwick/api/models/vacancy'
 
-require "pickwick/api/base"
+require 'pickwick/api/base'
 require 'pickwick/api/store'
-require "pickwick/api/application"
+require 'pickwick/api/search'
+require 'pickwick/api/application'
 
-require "pickwick/api/version"
+require 'pickwick/api/version'
 
 module Pickwick
   module API

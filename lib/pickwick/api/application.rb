@@ -31,6 +31,7 @@ module Pickwick
       end
 
       register Store
+      register Search
 
       private
       def access_denied
