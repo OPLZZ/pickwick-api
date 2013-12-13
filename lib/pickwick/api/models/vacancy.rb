@@ -85,7 +85,7 @@ module Pickwick
         end
       end
 
-      class Job
+      class Vacancy
         include Elasticsearch::Model::Persistence
 
         DEFAULT_EXPIRATION = 30.days
@@ -97,32 +97,32 @@ module Pickwick
 
         # TODO: add application `region` somehow
         #
-        index_name 'pickwick-api-jobs'
+        index_name 'pickwick-api-vacancies'
 
         settings index: { number_of_shards: 1 }
 
-        property :id,               String, accessor: :private, analyzer: 'keyword'
-        property :consumer_id,      String, writer: :private, analyzer: 'keyword'
-        property :title,            String
-        property :description,      String
-        property :industry,         String, analyzer: 'keyword'
-        property :responsibilities, String
+        property :id,                  String, accessor: :private, analyzer: 'keyword'
+        property :consumer_id,         String, writer:   :private, analyzer: 'keyword'
+        property :title,               String
+        property :description,         String
+        property :industry,            String, analyzer: 'keyword'
+        property :responsibilities,    String
+        property :number_of_positions, Integer
 
-        property :vacancies,        Integer
-        property :employment_type,  String,  analyzer: 'keyword'
-        property :remote,           Boolean, default: false
+        property :employment_type,     String,  analyzer: 'keyword'
+        property :remote,              Boolean, default: false
 
-        property :location,         Location
-        property :experience,       Experience
-        property :employer,         Employer
-        property :publisher,        Publisher
-        property :contact,          Contact
-        property :compensation,     Compensation
+        property :location,            Location
+        property :experience,          Experience
+        property :employer,            Employer
+        property :publisher,           Publisher
+        property :contact,             Contact
+        property :compensation,        Compensation
 
-        property :start_date,       Time
-        property :expiration_date,  Time, default: lambda { |job, attribute| Time.now.utc + DEFAULT_EXPIRATION }
-        property :created_at,       Time, default: lambda { |job, attribute| Time.now.utc }
-        property :updated_at,       Time # Todo: try elasticsearch timestamp
+        property :start_date,          Time
+        property :expiration_date,     Time, default: lambda { |vacancy, attribute| Time.now.utc + DEFAULT_EXPIRATION }
+        property :created_at,          Time, default: lambda { |vacancy, attribute| Time.now.utc }
+        property :updated_at,          Time # Todo: try elasticsearch timestamp
 
         validates_presence_of :title,
                               :description,

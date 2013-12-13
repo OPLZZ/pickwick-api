@@ -16,7 +16,7 @@ require 'pickwick/api/helpers/respond_with'
 require 'pickwick/api/helpers/common'
 
 require 'pickwick/api/models/consumer'
-require 'pickwick/api/models/job'
+require 'pickwick/api/models/vacancy'
 
 require "pickwick/api/base"
 require 'pickwick/api/store'

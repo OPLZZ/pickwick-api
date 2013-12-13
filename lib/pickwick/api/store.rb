@@ -12,19 +12,19 @@ module Pickwick
 
             ids               = payload.map { |data| data[:id] rescue nil }.compact
 
-            current_documents = ids.blank? ? [] : Job.find(ids)
+            current_documents = ids.blank? ? [] : Vacancy.find(ids)
 
             documents = payload.each_with_index.map do |data, index|
-              job                 = Job.new(data)
+              vacancy             = Vacancy.new(data)
 
               document            = {}
               document[:errors]   = {}
               document[:id]       = data[:id]
               document[:position] = index
-              document[:valid]    = job.valid?
+              document[:valid]    = vacancy.valid?
 
               unless document[:valid]
-                document[:errors] = job.errors
+                document[:errors] = vacancy.errors
                 document[:status] = 400
               end
 
@@ -36,17 +36,17 @@ module Pickwick
                     document[:valid]           = false
                     document[:status]          = 409
                     document[:errors][:base] ||= []
-                    document[:errors][:base]  << Job::ERRORS[409]
+                    document[:errors][:base]  << Vacancy::ERRORS[409]
                   end
                 else
                   document[:valid]           = false
                   document[:status]          = 404
                   document[:errors][:base] ||= []
-                  document[:errors][:base]  << Job::ERRORS[404]
+                  document[:errors][:base]  << Vacancy::ERRORS[404]
                 end
               end
 
-              document[:job] = job if document[:valid]
+              document[:vacancy] = vacancy if document[:valid]
 
               document
             end
@@ -58,26 +58,26 @@ module Pickwick
 
             unless valid_documents.blank?
 
-              jobs = valid_documents.map do |document|
-                job       = document[:job]
+              vacancies = valid_documents.map do |document|
+                vacancy       = document[:vacancy]
 
                 operation, id, data = if document[:id]
                   # TODO: send partial document instead of whole document
-                  [ :update, document[:id], { doc: job.as_indexed_json.merge(consumer_id: @consumer.id) } ]
+                  [ :update, document[:id], { doc: vacancy.as_indexed_json.merge(consumer_id: @consumer.id) } ]
                 else
-                  [ :create, job.id, job.as_indexed_json.merge(consumer_id: @consumer.id) ]
+                  [ :create, vacancy.id, vacancy.as_indexed_json.merge(consumer_id: @consumer.id) ]
                 end
 
                 operation = document[:id] ? :update : :create
-                id        = document[:id] ? document[:id] : job.id
+                id        = document[:id] ? document[:id] : vacancy.id
 
-                { operation => { _index: job.__elasticsearch__.index_name,
-                                 _type:  job.__elasticsearch__.document_type,
+                { operation => { _index: vacancy.__elasticsearch__.index_name,
+                                 _type:  vacancy.__elasticsearch__.document_type,
                                  _id:    id,
                                  data:   data } }
               end
 
-              result = Job.__elasticsearch__.client.bulk body: jobs
+              result = Vacancy.__elasticsearch__.client.bulk body: vacancies
 
               result["items"].each_with_index do |item, index|
                 result = item["create"] || item["update"]
@@ -91,7 +91,7 @@ module Pickwick
                   if result["error"].include?("document already exists")
                     valid_documents[index][:status]  = 409
                     valid_documents[index][:errors][:base] ||= []
-                    valid_documents[index][:errors][:base]  << Job::ERRORS[409]
+                    valid_documents[index][:errors][:base]  << Vacancy::ERRORS[409]
                   else
                     valid_documents[index][:status]  = 500
                     valid_documents[index][:errors][:base] ||= []

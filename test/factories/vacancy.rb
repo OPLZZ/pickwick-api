@@ -5,15 +5,13 @@ FactoryGirl.define do
   sequence(:random_title)       {|n| Faker::Lorem.sentence }
   sequence(:random_description) {|n| Faker::Lorem.paragraph }
 
-  factory :job do
+  factory :vacancy do
 
     title            { generate(:random_title)       }
     description      { generate(:random_description) }
     responsibilities { generate(:random_description) }
 
-    vacancies        { rand(5) }
-
-    employment_type  { Job::TYPES[rand(Job::TYPES.size)] }
+    employment_type  { Vacancy::TYPES[rand(Vacancy::TYPES.size)] }
 
     remote           { [true, false][rand(2)] }
 
@@ -58,6 +56,8 @@ FactoryGirl.define do
     end
 
     start_date { (Time.now + 1.month).utc }
+
+    number_of_positions { rand(5) }
 
     to_create  { |instance| instance.save }
 

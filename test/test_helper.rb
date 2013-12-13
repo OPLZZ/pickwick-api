@@ -33,16 +33,16 @@ class IntegrationTestCase < Test::Unit::TestCase
     super
 
     Consumer.index_name 'pickwick-api-consumers-test'
-    Job.index_name      'pickwick-api-jobs-test'
+    Vacancy.index_name  'pickwick-api-vacancies-test'
     Consumer.__elasticsearch__.create_index!
-    Job.__elasticsearch__.create_index!
+    Vacancy.__elasticsearch__.create_index!
   end
 
   def teardown
     super
 
     Consumer.__elasticsearch__.delete_index!
-    Job.__elasticsearch__.delete_index!
+    Vacancy.__elasticsearch__.delete_index!
   end
 
 end
