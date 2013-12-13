@@ -45,26 +45,26 @@ module Pickwick
 
         context "Credentials" do
           should "deny access without valid token" do
-            post '/store'
+            post '/vacancies'
 
             assert_equal 401, response.status
             assert_equal "Access denied", json(response.body)["error"]
           end
 
           should "deny access for user without `store` permission" do
-            post '/store', token: @search_consumer.token
+            post '/vacancies', token: @search_consumer.token
 
             assert_equal 401, response.status
             assert_equal "Access denied", json(response.body)["error"]
           end
 
           should "allow access for user with proper permission" do
-            post '/store', token: @store_consumer.token
+            post '/vacancies', token: @store_consumer.token
             assert response.ok?
           end
 
           should "return error message if something goes wrong" do
-            post 'store', token: @store_consumer.token, payload: '---'
+            post '/vacancies', token: @store_consumer.token, payload: '---'
             assert_equal 500, response.status
           end
         end
@@ -84,7 +84,7 @@ module Pickwick
 
           should "create new documents with consumer id" do
             vacancy = FactoryGirl.build(:vacancy)
-            post '/store', token: @store_consumer.token, payload: vacancy.as_indexed_json(except: [:consumer_id, :created_at, :updated_at]).to_json
+            post '/vacancies', token: @store_consumer.token, payload: vacancy.as_indexed_json(except: [:consumer_id, :created_at, :updated_at]).to_json
 
             persisted_vacancy = Vacancy.find(json(response.body)["results"].first["id"]).first
 
@@ -101,7 +101,7 @@ module Pickwick
             vacancy.save
             Vacancy.__elasticsearch__.refresh_index!
 
-            post '/store', token: @consumer.token, payload: vacancy.as_indexed_json.to_json
+            post '/vacancies', token: @consumer.token, payload: vacancy.as_indexed_json.to_json
             result = json(response.body)["results"].first
 
             assert response.ok?
@@ -115,7 +115,7 @@ module Pickwick
             vacancy.save
             Vacancy.__elasticsearch__.refresh_index!
 
-            post '/store', token: @consumer.token, payload: vacancy.as_indexed_json.merge(title: 'changed title', expiration_date: Time.now + 1.day, id: vacancy.id).to_json
+            post '/vacancies', token: @consumer.token, payload: vacancy.as_indexed_json.merge(title: 'changed title', expiration_date: Time.now + 1.day, id: vacancy.id).to_json
             result = json(response.body)["results"].first
 
             Vacancy.__elasticsearch__.refresh_index!
@@ -128,7 +128,7 @@ module Pickwick
           end
 
           should "not save invalid document" do
-            post '/store', token: @consumer.token, payload: Vacancy.new.as_indexed_json.to_json
+            post '/vacancies', token: @consumer.token, payload: Vacancy.new.as_indexed_json.to_json
             result = json(response.body)["results"].first
 
             assert response.ok?
@@ -142,7 +142,7 @@ module Pickwick
             vacancy.save
             Vacancy.__elasticsearch__.refresh_index!
 
-            post '/store', token: @consumer.token, payload: vacancy.as_indexed_json.merge(consumer_id: @consumer.id, id: vacancy.id).to_json
+            post '/vacancies', token: @consumer.token, payload: vacancy.as_indexed_json.merge(consumer_id: @consumer.id, id: vacancy.id).to_json
             result = json(response.body)["results"].first
 
             assert response.ok?
@@ -153,7 +153,7 @@ module Pickwick
           should "respond with elasticsearch error if persisting failed" do
             Vacancy.__elasticsearch__.client.expects(:bulk).returns("items" => [ { "create" => {"error" => "some elasticsearch error"}}])
 
-            post '/store', token: @consumer.token, payload: FactoryGirl.build(:vacancy).as_indexed_json.to_json
+            post '/vacancies', token: @consumer.token, payload: FactoryGirl.build(:vacancy).as_indexed_json.to_json
             result = json(response.body)["results"].first
 
             assert response.ok?
@@ -179,7 +179,7 @@ module Pickwick
                         someones_vacancy.as_indexed_json.merge(id: someones_vacancy.id).to_json,
                         non_existing_vacancy.as_indexed_json.merge(id: non_existing_vacancy.id).to_json ].join("\n")
 
-            post '/store', token: @consumer.token, payload: payload
+            post '/vacancies', token: @consumer.token, payload: payload
 
             r = json(response.body)
 
