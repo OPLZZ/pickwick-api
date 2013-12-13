@@ -19,8 +19,8 @@ module Pickwick
           get '/'
 
           assert response.ok?
-          assert_equal "Pickwick API", json(response.body)["application"]
-          assert_not_nil json(response.body)["revision"]
+          assert_equal "Pickwick API", json(response.body)[:application]
+          assert_not_nil json(response.body)[:revision]
         end
 
         should "respond with 406 status code if unknown mime type is requested" do
@@ -48,14 +48,14 @@ module Pickwick
             post '/vacancies'
 
             assert_equal 401, response.status
-            assert_equal "Access denied", json(response.body)["error"]
+            assert_equal "Access denied", json(response.body)[:error]
           end
 
           should "deny access for user without `store` permission" do
             post '/vacancies', token: @search_consumer.token
 
             assert_equal 401, response.status
-            assert_equal "Access denied", json(response.body)["error"]
+            assert_equal "Access denied", json(response.body)[:error]
           end
 
           should "allow access for user with proper permission" do
@@ -86,7 +86,7 @@ module Pickwick
             vacancy = FactoryGirl.build(:vacancy)
             post '/vacancies', token: @store_consumer.token, payload: vacancy.as_indexed_json(except: [:consumer_id, :created_at, :updated_at]).to_json
 
-            persisted_vacancy = Vacancy.find(json(response.body)["results"].first["id"]).first
+            persisted_vacancy = Vacancy.find(json(response.body)[:results].first[:id]).first
 
             assert response.ok?
 
@@ -102,11 +102,11 @@ module Pickwick
             Vacancy.__elasticsearch__.refresh_index!
 
             post '/vacancies', token: @consumer.token, payload: vacancy.as_indexed_json.to_json
-            result = json(response.body)["results"].first
+            result = json(response.body)[:results].first
 
             assert response.ok?
-            assert_equal 409,                  result["status"]
-            assert_equal Vacancy::ERRORS[409], result["errors"]["base"].first
+            assert_equal 409,                  result[:status]
+            assert_equal Vacancy::ERRORS[409], result[:errors][:base].first
           end
 
           should "update already saved document" do
@@ -116,10 +116,10 @@ module Pickwick
             Vacancy.__elasticsearch__.refresh_index!
 
             post '/vacancies', token: @consumer.token, payload: vacancy.as_indexed_json.merge(title: 'changed title', expiration_date: Time.now + 1.day, id: vacancy.id).to_json
-            result = json(response.body)["results"].first
+            result = json(response.body)[:results].first
 
             Vacancy.__elasticsearch__.refresh_index!
-            vacancy = Vacancy.find(result["id"]).first
+            vacancy = Vacancy.find(result[:id]).first
 
             assert response.ok?
             assert_equal "changed title",           vacancy.title
@@ -129,11 +129,11 @@ module Pickwick
 
           should "not save invalid document" do
             post '/vacancies', token: @consumer.token, payload: Vacancy.new.as_indexed_json.to_json
-            result = json(response.body)["results"].first
+            result = json(response.body)[:results].first
 
             assert response.ok?
-            assert_equal 400, result["status"]
-            assert_equal ["can't be blank"], result["errors"]["title"]
+            assert_equal 400, result[:status]
+            assert_equal ["can't be blank"], result[:errors][:title]
           end
 
           should "not allow to take ownership" do
@@ -143,22 +143,22 @@ module Pickwick
             Vacancy.__elasticsearch__.refresh_index!
 
             post '/vacancies', token: @consumer.token, payload: vacancy.as_indexed_json.merge(consumer_id: @consumer.id, id: vacancy.id).to_json
-            result = json(response.body)["results"].first
+            result = json(response.body)[:results].first
 
             assert response.ok?
-            assert_equal 409, result["status"]
-            assert_equal vacancy.consumer_id, Vacancy.find(result["id"]).first.consumer_id
+            assert_equal 409, result[:status]
+            assert_equal vacancy.consumer_id, Vacancy.find(result[:id]).first.consumer_id
           end
 
           should "respond with elasticsearch error if persisting failed" do
             Vacancy.__elasticsearch__.client.expects(:bulk).returns("items" => [ { "create" => {"error" => "some elasticsearch error"}}])
 
             post '/vacancies', token: @consumer.token, payload: FactoryGirl.build(:vacancy).as_indexed_json.to_json
-            result = json(response.body)["results"].first
+            result = json(response.body)[:results].first
 
             assert response.ok?
-            assert_equal 500,                        result["status"]
-            assert_equal "some elasticsearch error", result["errors"]["base"].first
+            assert_equal 500,                        result[:status]
+            assert_equal "some elasticsearch error", result[:errors][:base].first
           end
 
           should "respond with correct order" do
@@ -187,34 +187,34 @@ module Pickwick
 
             # First document was existing one, should be updated
             #
-            assert_equal existing_vacancy.id, r["results"][0]["id"]
-            assert_equal 2,               r["results"][0]["version"]
-            assert_equal 200,             r["results"][0]["status"]
+            assert_equal existing_vacancy.id, r[:results][0][:id]
+            assert_equal 2,               r[:results][0][:version]
+            assert_equal 200,             r[:results][0][:status]
 
             # Second document was invalid, should return errors
             #
-            assert_nil r["results"][1]["id"]
-            assert_equal 400,              r["results"][1]["status"]
-            assert_equal 4,                r["results"][1]["errors"].keys.size
-            assert_equal "can't be blank", r["results"][1]["errors"]["title"].first
+            assert_nil r[:results][1][:id]
+            assert_equal 400,              r[:results][1][:status]
+            assert_equal 4,                r[:results][1][:errors].keys.size
+            assert_equal "can't be blank", r[:results][1][:errors][:title].first
 
             # Third document was new one, should be stored
             #
-            assert_not_nil    r["results"][2]["id"]
-            assert_equal 1,   r["results"][2]["version"]
-            assert_equal 201, r["results"][2]["status"]
+            assert_not_nil    r[:results][2][:id]
+            assert_equal 1,   r[:results][2][:version]
+            assert_equal 201, r[:results][2][:status]
 
             # Fourth document was someone else's, should return error
             #
-            assert_not_nil                 r["results"][3]["id"]
-            assert_equal 409,              r["results"][3]["status"]
-            assert_equal Vacancy::ERRORS[409], r["results"][3]["errors"]["base"].first
+            assert_not_nil                     r[:results][3][:id]
+            assert_equal 409,                  r[:results][3][:status]
+            assert_equal Vacancy::ERRORS[409], r[:results][3][:errors][:base].first
 
             # Fifth document is not in the index (expired, deleted), should return error
             #
-            assert_equal non_existing_vacancy.id, r["results"][4]["id"]
-            assert_equal 404,                 r["results"][4]["status"]
-            assert_equal Vacancy::ERRORS[404],    r["results"][4]["errors"]["base"].first
+            assert_equal non_existing_vacancy.id, r[:results][4][:id]
+            assert_equal 404,                     r[:results][4][:status]
+            assert_equal Vacancy::ERRORS[404],    r[:results][4][:errors][:base].first
           end
 
         end

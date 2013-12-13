@@ -50,7 +50,7 @@ end
 class Test::Unit::TestCase
 
   def json(json)
-    MultiJson.load(json)
+    MultiJson.load(json, symbolize_keys: true)
   end
 
 end
