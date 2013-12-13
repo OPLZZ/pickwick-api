@@ -16,6 +16,13 @@ require 'pickwick/api/helpers/respond_with'
 require 'pickwick/api/helpers/common'
 
 require 'pickwick/api/models/consumer'
+require 'pickwick/api/models/employer'
+require 'pickwick/api/models/experience'
+require 'pickwick/api/models/publisher'
+require 'pickwick/api/models/coordinates'
+require 'pickwick/api/models/location'
+require 'pickwick/api/models/compensation'
+require 'pickwick/api/models/contact'
 require 'pickwick/api/models/vacancy'
 
 require "pickwick/api/base"
