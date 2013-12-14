@@ -62,6 +62,7 @@ module Pickwick
                 vacancy       = document[:vacancy]
 
                 operation, id, data = if document[:id]
+                  vacancy.set_updated_at
                   # TODO: send partial document instead of whole document
                   [ :update, document[:id], { doc: vacancy.as_indexed_json.merge(consumer_id: @consumer.id) } ]
                 else

@@ -39,7 +39,7 @@ module Pickwick
         property :start_date,          Time
         property :expiration_date,     Time, default: lambda { |vacancy, attribute| Time.now.utc + DEFAULT_EXPIRATION }
         property :created_at,          Time, default: lambda { |vacancy, attribute| Time.now.utc }
-        property :updated_at,          Time # Todo: try elasticsearch timestamp
+        property :updated_at,          Time, default: lambda { |vacancy, attribute| Time.now.utc } # Todo: try elasticsearch timestamp
 
         validates_presence_of :title,
                               :description,
@@ -70,11 +70,11 @@ module Pickwick
           {id: id}.merge(as_json(except: [:consumer_id]))
         end
 
-        private
-
         def set_updated_at
           self.updated_at = Time.now.utc
         end
+
+        private
 
         def __computed_id
           Digest::SHA1.hexdigest(attributes.slice(:title, :description, :start_date, :location).to_json)
