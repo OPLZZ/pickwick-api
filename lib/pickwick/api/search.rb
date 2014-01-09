@@ -7,17 +7,15 @@ module Pickwick
       in_application do
 
         get "/vacancies", permission: :search do
-          begin
+          in_request do
             vacancies = Vacancy.search("*").records
 
             json(vacancies: vacancies.map(&:public_properties))
-          rescue Exception => e
-            error 500, json(error: e.class, description: e.message, backtrace: e.backtrace.first)
           end
         end
 
         get "/vacancies/:id", permission: :search do
-          begin
+          in_request do
             vacancy = Vacancy.find(params[:id]).first
 
             if vacancy
@@ -25,9 +23,9 @@ module Pickwick
             else
               halt 404, json(error: 'Not found')
             end
+          end
+        end
 
-          rescue Exception => e
-            error 500, json(error: e.class, description: e.message, backtrace: e.backtrace.first)
           end
         end
 

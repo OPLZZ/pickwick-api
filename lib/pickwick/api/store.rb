@@ -7,7 +7,7 @@ module Pickwick
       in_application do
 
         post "/vacancies", permission: :store do
-          begin
+          in_request do
             payload = params[:payload].to_s.split("\n").map { |p| MultiJson.load(p, symbolize_keys: true) rescue nil }
 
             ids               = payload.map { |data| data[:id] rescue nil }.compact
@@ -106,8 +106,6 @@ module Pickwick
             response = (invalid_documents + valid_documents).sort_by { |document| document[:position] }
 
             json(results: response.map { |r| { id: r[:id], version: r[:version], status: r[:status], errors: r[:errors] } })
-          rescue Exception => e
-            error 500, json(error: e.class, description: e.message, backtrace: e.backtrace.first)
           end
         end
 
