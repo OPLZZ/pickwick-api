@@ -1,24 +1,27 @@
 # Pickwick::API
 
-Main API for damepraci.eu project.
+This repository represents main API for damepraci.eu project.
+
+API currently implements `/vacancies` endpoint which consists of two main parts
+
+* Search API
+* Store  API
+
+### Vacancies Search API
+
+__TODO__
+
+### Vacancies Store API
+
+__TODO__
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-    gem 'pickwick-api'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install pickwick-api
+__TODO__
 
 ## Usage
 
-TODO: Write usage instructions here
+__TODO__
 
 ## Contributing
 
