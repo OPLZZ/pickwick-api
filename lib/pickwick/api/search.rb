@@ -26,6 +26,11 @@ module Pickwick
           end
         end
 
+        post "/vacancies/bulk", permission: :search do
+          in_request do
+            vacancies = Vacancy.find(params[:ids])
+
+            json(vacancies: vacancies.map(&:public_properties))
           end
         end
 

@@ -249,8 +249,10 @@ module Pickwick
           end
 
           context "Getting vacancy by id" do
+
             setup do
-              @vacancy = FactoryGirl.create(:vacancy)
+              @vacancy         = FactoryGirl.create(:vacancy)
+              @another_vacancy = FactoryGirl.create(:vacancy)
               Vacancy.__elasticsearch__.refresh_index!
             end
 
@@ -272,6 +274,20 @@ module Pickwick
 
               assert_equal 404,         response.status
               assert_equal "Not found", r[:error]
+            end
+
+            should "return vacancies by multiple ids (by calling bulk endpoint)" do
+              post "/vacancies/bulk", ids: [@another_vacancy.id, @vacancy.id, '123'], token: @search_consumer.token
+
+              r = json(response.body)
+
+              assert response.ok?
+
+              assert_equal @another_vacancy.id,    r[:vacancies].first[:id]
+              assert_equal @another_vacancy.title, r[:vacancies].first[:title]
+
+              assert_equal @vacancy.id,    r[:vacancies].last[:id]
+              assert_equal @vacancy.title, r[:vacancies].last[:title]
             end
 
           end
