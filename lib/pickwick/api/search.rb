@@ -6,7 +6,7 @@ module Pickwick
 
       in_application do
 
-        get "/vacancies", permission: :search do
+        post "/vacancies/search", permission: :search do
           in_request do
             vacancies = Vacancy.search("*").records
 
