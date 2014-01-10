@@ -84,6 +84,12 @@ module Pickwick
 
           should "create new documents with consumer id" do
             vacancy = FactoryGirl.build(:vacancy)
+
+            Rubykiq.expects(:push).with do |options|
+              assert_equal 'Pickwick::Workers::Enrichment::All', options[:class]
+              assert_not_nil options[:args].first[:id]
+            end
+
             post '/vacancies', token: @store_consumer.token, payload: vacancy.as_indexed_json(except: [:consumer_id, :created_at, :updated_at]).to_json
 
             persisted_vacancy = Vacancy.find(json(response.body)[:results].first[:id]).first
@@ -96,6 +102,8 @@ module Pickwick
           end
 
           should "not modify vacancy from other API consumer" do
+            Rubykiq.expects(:push).never
+
             vacancy = FactoryGirl.build(:vacancy)
             vacancy.set_consumer_id "123"
             vacancy.save
@@ -110,6 +118,8 @@ module Pickwick
           end
 
           should "update already saved document" do
+            Rubykiq.expects(:push).never
+
             vacancy = FactoryGirl.build(:vacancy)
             vacancy.set_consumer_id @consumer.id
             vacancy.save
@@ -128,6 +138,8 @@ module Pickwick
           end
 
           should "not save invalid document" do
+            Rubykiq.expects(:push).never
+
             post '/vacancies', token: @consumer.token, payload: Vacancy.new.as_indexed_json.to_json
             result = json(response.body)[:results].first
 
@@ -137,6 +149,8 @@ module Pickwick
           end
 
           should "not allow to take ownership" do
+            Rubykiq.expects(:push).never
+
             vacancy = FactoryGirl.build(:vacancy)
             vacancy.set_consumer_id '123'
             vacancy.save
@@ -151,6 +165,8 @@ module Pickwick
           end
 
           should "respond with elasticsearch error if persisting failed" do
+            Rubykiq.expects(:push).never
+
             Vacancy.__elasticsearch__.client.expects(:bulk).returns("items" => [ { "create" => {"error" => "some elasticsearch error"}}])
 
             post '/vacancies', token: @consumer.token, payload: FactoryGirl.build(:vacancy).as_indexed_json.to_json

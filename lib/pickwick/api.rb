@@ -1,4 +1,5 @@
 require 'sinatra/base'
+require 'rubykiq'
 
 require 'rdiscount'
 require 'pry' unless Sinatra::Base.production?

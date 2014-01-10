@@ -36,6 +36,8 @@ class IntegrationTestCase < Test::Unit::TestCase
     Vacancy.index_name  'pickwick-api-vacancies-test'
     Consumer.__elasticsearch__.create_index!
     Vacancy.__elasticsearch__.create_index!
+
+    Rubykiq.stubs(:push)
   end
 
   def teardown
@@ -43,6 +45,8 @@ class IntegrationTestCase < Test::Unit::TestCase
 
     Consumer.__elasticsearch__.delete_index!
     Vacancy.__elasticsearch__.delete_index!
+
+    Rubykiq.unstub(:push)
   end
 
 end

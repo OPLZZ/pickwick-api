@@ -88,6 +88,12 @@ module Pickwick
 
                 if result["ok"]
                   valid_documents[index][:status] = valid_documents[index][:version].to_i == 1 ? 201 : 200
+
+                  # TODO: enqueue jobs according to changed attributes (not only after create)
+                  Rubykiq.push class:     'Pickwick::Workers::Enrichment::All',
+                               queue:     :enrichment,
+                               retry:     false,
+                               args:      [{ id: valid_documents[index][:id] }] if item["create"]
                 else
                   if result["error"].include?("document already exists")
                     valid_documents[index][:status]  = 409

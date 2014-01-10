@@ -19,6 +19,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "sinatra"
+  spec.add_dependency "rubykiq"
   spec.add_dependency "rdiscount"
   spec.add_dependency "virtus"
   spec.add_dependency "activemodel", "~> 4"
