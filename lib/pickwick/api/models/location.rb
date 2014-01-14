@@ -8,6 +8,7 @@ module Pickwick
         property :street,      String
         property :city,        String
         property :region,      String
+        property :zip,         String
 
         # TODO: Check country format
         #

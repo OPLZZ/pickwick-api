@@ -95,7 +95,7 @@ module Pickwick
             @vacancy.start_date  = Time.now.utc
 
             @vacancy.__elasticsearch__.client.expects(:index).with do |options|
-              assert_equal "8adad4682cd0c1a564f6a6ebc675b180b12637b5", options[:id]
+              assert_equal "89e7faa6e78ef3a44f25360223f09bd3474ffc52", options[:id]
             end.returns({})
 
             @vacancy.save
