@@ -1,8 +1,8 @@
 GIT
-  remote: git@github.com:karmi/elasticsearch-rails.git
-  revision: 6d994462cb41b142ee784c6be4d3e2cceae5c05d
+  remote: https://github.com/elasticsearch/elasticsearch-rails
+  revision: 04a637725dbf44589618758c93293646d12415d9
   specs:
-    elasticsearch-model (0.0.0)
+    elasticsearch-model (0.1.0.rc1)
       elasticsearch (~> 0.4)
       hashie
 
@@ -43,12 +43,12 @@ GEM
     connection_pool (1.2.0)
     descendants_tracker (0.0.3)
     docile (1.1.1)
-    elasticsearch (0.4.3)
-      elasticsearch-api (= 0.4.3)
-      elasticsearch-transport (= 0.4.3)
-    elasticsearch-api (0.4.3)
+    elasticsearch (0.4.7)
+      elasticsearch-api (= 0.4.7)
+      elasticsearch-transport (= 0.4.7)
+    elasticsearch-api (0.4.7)
       multi_json
-    elasticsearch-transport (0.4.3)
+    elasticsearch-transport (0.4.7)
       faraday
       multi_json
     equalizer (0.0.9)
@@ -56,8 +56,8 @@ GEM
       activesupport (>= 3.0.0)
     faker (1.2.0)
       i18n (~> 0.5)
-    faraday (0.8.8)
-      multipart-post (~> 1.2.0)
+    faraday (0.9.0)
+      multipart-post (>= 1.2, < 3)
     hashie (2.0.5)
     i18n (0.6.5)
     ice_nine (0.11.0)
@@ -70,8 +70,8 @@ GEM
     minitest (4.7.5)
     mocha (0.14.0)
       metaclass (~> 0.0.1)
-    multi_json (1.8.2)
-    multipart-post (1.2.0)
+    multi_json (1.8.4)
+    multipart-post (2.0.0)
     oj (2.5.3)
     pry (0.9.12.2)
       coderay (~> 1.0.5)
