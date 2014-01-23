@@ -42,3 +42,10 @@ module Pickwick
     end
   end
 end
+
+# Set elasticsearch client to ELASTICSEARCH_API_URL environment variable
+#
+Elasticsearch::Model.client = Elasticsearch::Client.new url: ENV["ELASTICSEARCH_API_URL"] || 'http://localhost:9200'
+
+# Set redis client to SIDEKIQ_REDIS_URL environment variable
+Rubykiq.url = ENV["SIDEKIQ_REDIS_URL"] || 'redis://localhost:6379'
