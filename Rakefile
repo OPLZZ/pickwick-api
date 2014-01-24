@@ -24,6 +24,15 @@ task :setup do
   Pickwick::API::Models::Consumer.__elasticsearch__.create_index!
   Pickwick::API::Models::Vacancy.__elasticsearch__.create_index!
 
+  if ENV["CONSUMER_TOKEN"] && Pickwick::API::Models::Consumer.find_by_token(ENV["CONSUMER_TOKEN"]).nil?
+    puts "[*] Creating default API consumer with token: `#{ENV["CONSUMER_TOKEN"]}`..."
+
+    Pickwick::API::Models::Consumer.create name:        "Pickwick API Workers",
+                                           description: "Official API consumer for feeders and enrichment workers",
+                                           token:       ENV["CONSUMER_TOKEN"],
+                                           permission:  { search: true, store: true }
+  end
+
   puts "[*] DONE"
 end
 
