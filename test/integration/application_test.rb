@@ -167,7 +167,7 @@ module Pickwick
           should "respond with elasticsearch error if persisting failed" do
             Rubykiq.expects(:push).never
 
-            Vacancy.__elasticsearch__.client.expects(:bulk).returns("items" => [ { "create" => {"error" => "some elasticsearch error"}}])
+            Vacancy.__elasticsearch__.client.expects(:bulk).returns("items" => [ { "create" => {"status" => 500, "error" => "some elasticsearch error"}}])
 
             post '/vacancies', token: @consumer.token, payload: FactoryGirl.build(:vacancy).as_indexed_json.to_json
             result = json(response.body)[:results].first
@@ -234,100 +234,99 @@ module Pickwick
           end
 
         end
+      end
 
-        context "Search" do
+      context "Search" do
+        setup do
+          @store_consumer  = FactoryGirl.create(:store_consumer)
+          @search_consumer = FactoryGirl.create(:search_consumer)
+
+          Consumer.__elasticsearch__.refresh_index!
+        end
+
+        context "Credentials" do
+          should "deny access without valid token" do
+            post '/vacancies/search'
+
+            assert_equal 401, response.status
+            assert_equal "Access denied", json(response.body)[:error]
+          end
+
+          should "deny access for user without `store` permission" do
+            post '/vacancies/search', token: @store_consumer.token
+
+            assert_equal 401, response.status
+            assert_equal "Access denied", json(response.body)[:error]
+          end
+
+          should "allow access for user with proper permission" do
+            post '/vacancies/search', token: @search_consumer.token
+            assert response.ok?
+          end
+        end
+
+        context "Getting vacancy by id" do
+
           setup do
-            @store_consumer  = FactoryGirl.create(:store_consumer)
-            @search_consumer = FactoryGirl.create(:search_consumer)
-
-            Consumer.__elasticsearch__.refresh_index!
+            @vacancy         = FactoryGirl.create(:vacancy)
+            @another_vacancy = FactoryGirl.create(:vacancy)
+            Vacancy.__elasticsearch__.refresh_index!
           end
 
-          context "Credentials" do
-            should "deny access without valid token" do
-              post '/vacancies/search'
+          should "return vacancy by its id" do
+            get "/vacancies/#{@vacancy.id}", token: @search_consumer.token
 
-              assert_equal 401, response.status
-              assert_equal "Access denied", json(response.body)[:error]
-            end
+            r = json(response.body)
 
-            should "deny access for user without `store` permission" do
-              post '/vacancies/search', token: @store_consumer.token
-
-              assert_equal 401, response.status
-              assert_equal "Access denied", json(response.body)[:error]
-            end
-
-            should "allow access for user with proper permission" do
-              post '/vacancies/search', token: @search_consumer.token
-              assert response.ok?
-            end
+            assert response.ok?
+            assert_equal @vacancy.id,    r[:vacancy][:id]
+            assert_equal @vacancy.title, r[:vacancy][:title]
+            assert_nil   r[:vacancy][:consumer_id]
           end
 
-          context "Getting vacancy by id" do
+          should "return 'not found' error if vacancy not found by id" do
+            get "/vacancies/123", token: @search_consumer.token
 
-            setup do
-              @vacancy         = FactoryGirl.create(:vacancy)
-              @another_vacancy = FactoryGirl.create(:vacancy)
-              Vacancy.__elasticsearch__.refresh_index!
-            end
+            r = json(response.body)
 
-            should "return vacancy by its id" do
-              get "/vacancies/#{@vacancy.id}", token: @search_consumer.token
-
-              r = json(response.body)
-
-              assert response.ok?
-              assert_equal @vacancy.id,    r[:vacancy][:id]
-              assert_equal @vacancy.title, r[:vacancy][:title]
-              assert_nil   r[:vacancy][:consumer_id]
-            end
-
-            should "return 'not found' error if vacancy not found by id" do
-              get "/vacancies/123", token: @search_consumer.token
-
-              r = json(response.body)
-
-              assert_equal 404,         response.status
-              assert_equal "Not found", r[:error]
-            end
-
-            should "return vacancies by multiple ids (by calling bulk endpoint)" do
-              post "/vacancies/bulk", ids: [@another_vacancy.id, @vacancy.id, '123'], token: @search_consumer.token
-
-              r = json(response.body)
-
-              assert response.ok?
-
-              assert_equal @another_vacancy.id,    r[:vacancies].first[:id]
-              assert_equal @another_vacancy.title, r[:vacancies].first[:title]
-
-              assert_equal @vacancy.id,    r[:vacancies].last[:id]
-              assert_equal @vacancy.title, r[:vacancies].last[:title]
-            end
-
+            assert_equal 404,         response.status
+            assert_equal "Not found", r[:error]
           end
 
-          context "Searching for vacancies" do
-            setup do
-              @vacancies = FactoryGirl.create_list(:vacancy, 10)
-              Vacancy.__elasticsearch__.refresh_index!
-            end
+          should "return vacancies by multiple ids (by calling bulk endpoint)" do
+            post "/vacancies/bulk", ids: [@another_vacancy.id, @vacancy.id, '123'], token: @search_consumer.token
 
-            should "return array of vacancies" do
-              post "/vacancies/search", token: @search_consumer.token
+            r = json(response.body)
 
-              r = json(response.body)
+            assert response.ok?
+            assert_equal @another_vacancy.id,    r[:vacancies].first[:id]
+            assert_equal @another_vacancy.title, r[:vacancies].first[:title]
 
-              assert response.ok?
-              assert_equal 10, r[:vacancies].size
-              assert_not_nil   r[:vacancies].first[:title]
-              assert_nil       r[:vacancies].first[:consumer_id]
-            end
-
+            assert_equal @vacancy.id,    r[:vacancies].last[:id]
+            assert_equal @vacancy.title, r[:vacancies].last[:title]
           end
 
         end
+
+        context "Searching for vacancies" do
+          setup do
+            @vacancies = FactoryGirl.create_list(:vacancy, 10)
+            Vacancy.__elasticsearch__.refresh_index!
+          end
+
+          should "return array of vacancies" do
+            post "/vacancies/search", token: @search_consumer.token
+
+            r = json(response.body)
+
+            assert response.ok?
+            assert_equal 10, r[:vacancies].size
+            assert_not_nil   r[:vacancies].first[:title]
+            assert_nil       r[:vacancies].first[:consumer_id]
+          end
+
+        end
+
       end
     end
   end

@@ -64,7 +64,7 @@ module Elasticsearch
           response = __elasticsearch__.client.mget body: { docs: docs }
 
           response["docs"].map do |doc|
-            self.initialize_from_response(doc) if doc["exists"]
+            self.initialize_from_response(doc) if doc["found"]
           end.compact
         end
 

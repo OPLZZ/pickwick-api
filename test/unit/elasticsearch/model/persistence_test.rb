@@ -164,7 +164,7 @@ class ElasticsearchModelPersistenceTest < Test::Unit::TestCase
     should "raise exception if no setter is available for private property" do
       User.__elasticsearch__.client
                                  .expects(:mget)
-                                 .returns("docs" => [ { "exists" => true, "_id" => "123", "_source" => {} } ])
+                                 .returns("docs" => [ { "found" => true, "_id" => "123", "_source" => {} } ])
 
       assert_raise(NoMethodError) { User.find("123") }
     end
@@ -201,8 +201,8 @@ class ElasticsearchModelPersistenceTest < Test::Unit::TestCase
         assert_equal "article",  arguments[:body][:docs].first[:_type]
         assert_equal "123",      arguments[:body][:docs].first[:_id]
         assert_equal "456",      arguments[:body][:docs].last[:_id]
-      end.returns("docs" => [ { "exists" => true, "_id" => "123", "_source" => { "name" => "Test", "publisher" => { "name" => "Publisher" } } },
-                              { "exists" => false, "_id" => "456" } ])
+      end.returns("docs" => [ { "found" => true, "_id" => "123", "_source" => { "name" => "Test", "publisher" => { "name" => "Publisher" } } },
+                              { "found" => false, "_id" => "456" } ])
 
       articles = Article.find("123", "456")
 
