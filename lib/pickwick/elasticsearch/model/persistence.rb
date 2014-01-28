@@ -38,6 +38,7 @@ module Elasticsearch
 
           instance.__set_property(:id,        response["_id"])
           instance.__set_property(:version,   response["_version"])
+          instance.__set_property(:fields,    (response["fields"] || {}).symbolize_keys!)
           instance.__set_property(:persisted, true)
 
           instance
@@ -98,7 +99,7 @@ module Elasticsearch
       end
 
       module InstanceMethods
-        attr_accessor :version, :persisted
+        attr_accessor :version, :persisted, :fields
 
         def as_json(options = {})
           self.to_hash.as_json(options)
