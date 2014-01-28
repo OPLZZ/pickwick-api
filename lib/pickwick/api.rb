@@ -29,6 +29,7 @@ require 'pickwick/api/models/location'
 require 'pickwick/api/models/compensation'
 require 'pickwick/api/models/contact'
 require 'pickwick/api/models/vacancy'
+require 'pickwick/api/models/query_builder'
 
 require 'pickwick/api/base'
 require 'pickwick/api/store'

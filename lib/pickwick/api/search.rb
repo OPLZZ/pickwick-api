@@ -8,9 +8,10 @@ module Pickwick
 
         get "/vacancies", permission: :search do
           in_request do
-            vacancies = Vacancy.search("*").records
 
-            json(vacancies: vacancies.map(&:public_properties))
+            query     = QueryBuilder.new(params)
+            vacancies = Vacancy.search(query.to_hash).records
+
             Presenters::Search.new(vacancies).as_json
           end
         end
