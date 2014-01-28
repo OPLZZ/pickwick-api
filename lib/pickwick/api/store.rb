@@ -106,9 +106,9 @@ module Pickwick
 
             end
 
-            response = (invalid_documents + valid_documents).sort_by { |document| document[:position] }
+            results = (invalid_documents + valid_documents).sort_by { |document| document[:position] }
 
-            json(results: response.map { |r| { id: r[:id], version: r[:version], status: r[:status], errors: r[:errors] } })
+            Presenters::Store.new(results).as_json
           end
         end
 
