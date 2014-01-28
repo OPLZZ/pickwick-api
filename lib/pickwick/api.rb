@@ -6,6 +6,7 @@ require 'pry' unless Sinatra::Base.production?
 
 require 'active_model'
 require 'virtus'
+require 'oj'
 require 'elasticsearch/model'
 require 'jbuilder'
 require 'ruby-duration'
