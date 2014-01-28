@@ -246,21 +246,21 @@ module Pickwick
 
         context "Credentials" do
           should "deny access without valid token" do
-            post '/vacancies/search'
+            get '/vacancies'
 
             assert_equal 401, response.status
             assert_equal "Access denied", json(response.body)[:error]
           end
 
           should "deny access for user without `store` permission" do
-            post '/vacancies/search', token: @store_consumer.token
+            get '/vacancies', token: @store_consumer.token
 
             assert_equal 401, response.status
             assert_equal "Access denied", json(response.body)[:error]
           end
 
           should "allow access for user with proper permission" do
-            post '/vacancies/search', token: @search_consumer.token
+            get '/vacancies', token: @search_consumer.token
             assert response.ok?
           end
         end
@@ -315,7 +315,7 @@ module Pickwick
           end
 
           should "return array of vacancies" do
-            post "/vacancies/search", token: @search_consumer.token
+            get "/vacancies", token: @search_consumer.token
 
             r = json(response.body)
 
