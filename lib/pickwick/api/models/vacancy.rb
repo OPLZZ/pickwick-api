@@ -67,7 +67,10 @@ module Pickwick
         end
 
         def public_properties
-          {id: id}.merge(as_json(except: [:consumer_id]))
+          properties = {
+            id:       id,
+            distance: fields[:distance] && fields[:distance].first ? fields[:distance].first.to_f : nil
+          }.merge(as_json(except: [:consumer_id]))
         end
 
         def set_updated_at
