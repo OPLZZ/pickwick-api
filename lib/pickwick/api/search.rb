@@ -11,6 +11,7 @@ module Pickwick
             vacancies = Vacancy.search("*").records
 
             json(vacancies: vacancies.map(&:public_properties))
+            Presenters::Search.new(vacancies).as_json
           end
         end
 
