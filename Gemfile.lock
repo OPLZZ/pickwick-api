@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/elasticsearch/elasticsearch-rails
-  revision: 04a637725dbf44589618758c93293646d12415d9
+  revision: eba62e9232be266b940864b23cc851c212fd4503
   specs:
     elasticsearch-model (0.1.0.rc1)
       elasticsearch (~> 0.4)
@@ -73,21 +73,21 @@ GEM
       metaclass (~> 0.0.1)
     multi_json (1.8.4)
     multipart-post (2.0.0)
-    oj (2.5.3)
+    oj (2.5.4)
     pry (0.9.12.2)
       coderay (~> 1.0.5)
       method_source (~> 0.8)
       slop (~> 3.4)
-    puma (2.4.0)
+    puma (2.7.1)
       rack (>= 1.1, < 2.0)
     rack (1.5.2)
-    rack-protection (1.5.1)
+    rack-protection (1.5.2)
       rack
     rack-test (0.6.2)
       rack (>= 1.0)
     rake (10.1.0)
     rdiscount (2.1.7)
-    redis (3.0.6)
+    redis (3.0.7)
     redis-namespace (1.4.1)
       redis (~> 3.0.4)
     ruby-duration (3.1.0)
