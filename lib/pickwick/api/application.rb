@@ -23,6 +23,10 @@ module Pickwick
         end
       end
 
+      before do
+        headers( "Access-Control-Allow-Origin" => "*" )
+      end
+
       get '/' do
         respond_with do
           html { erb  :readme }
