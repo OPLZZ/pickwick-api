@@ -59,6 +59,23 @@ module Pickwick
                            "responsibilities" ], definition[:query][:function_score][:query][:multi_match][:fields]
           end
 
+          should "calculate `from`, `size` attributes to get desired result page" do
+            definition = QueryBuilder.new.to_hash
+
+            assert_equal 25, definition[:size]
+            assert_equal 0,  definition[:from]
+
+            definition = QueryBuilder.new(page: 3).to_hash
+
+            assert_equal 25, definition[:size]
+            assert_equal 50, definition[:from]
+
+            definition = QueryBuilder.new(page: 3, per_page: 10).to_hash
+
+            assert_equal 10, definition[:size]
+            assert_equal 20, definition[:from]
+          end
+
           should "use same seed as in parameters" do
             definition = QueryBuilder.new(seed: 123).to_hash
 

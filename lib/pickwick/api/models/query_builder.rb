@@ -3,7 +3,7 @@ module Pickwick
     module Models
       class QueryBuilder
 
-        attr_accessor :params, :definition
+        attr_accessor :params, :definition, :page, :per_page
 
         def initialize(params = {})
           @params          = params
@@ -32,6 +32,9 @@ module Pickwick
                              end if params[:remote] || params[:r]
 
           @latitude, @longitude = @location.split(",").map { |coordinate| coordinate.to_f } if @location
+
+          @page     = (params[:page]     || 1).to_i
+          @per_page = (params[:per_page] || 25).to_i
         end
 
         def __build!
@@ -51,7 +54,8 @@ module Pickwick
             }
           }
 
-          definition[:size] = 20
+          definition[:size] = @per_page
+          definition[:from] = (@page - 1) * @per_page
 
           self
         end
