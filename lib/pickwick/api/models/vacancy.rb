@@ -68,8 +68,9 @@ module Pickwick
 
         def public_properties
           properties = {
-            id:       id,
-            distance: fields[:distance] && fields[:distance].first ? fields[:distance].first.to_f : nil
+            'id'       => id,
+            'distance' => fields[:distance] && fields[:distance].first ? fields[:distance].first.to_f : nil,
+            'score'    => score,
           }.merge(as_json(except: [:consumer_id]))
         end
 
