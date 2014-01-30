@@ -21,6 +21,7 @@ module Pickwick
         def __parse_params!
           @location        = params[:location]        || params[:l]
           @query           = params[:query]           || params[:q]
+          @preference      = params[:preference]      || params[:p]
           @employment_type = params[:employment_type] || params[:type] || params[:t]
           @seed            = params[:seed]            || __generate_seed
 
@@ -61,24 +62,42 @@ module Pickwick
         end
 
         def __fulltext_query
+          match_all_definition = { match_all: {} }
+          multi_match_query    = { multi_match: {
+                                     fields: [ "title",
+                                               "description",
+                                               "industry",
+                                               "contact.*",
+                                               "employer.*",
+                                               "employment_type",
+                                               "experience.*",
+                                               "location.*",
+                                               "publisher.*",
+                                               "responsibilities" ]} }
+
           case
+          when @query && @preference
+            query            = multi_match_query.deep_merge(multi_match: { query: @query })
+            preference_query = { bool: {
+                                        should: [
+                                          multi_match_query.deep_merge(multi_match: { query: @preference }),
+                                          match_all_definition
+                                        ],
+                                        minimum_number_should_match: 1
+                                      }
+                                    }
+
+            return { bool: { must: [ query, preference_query ] } }
           when @query
-            { multi_match: {
-                query:  @query,
-                fields: [ "title",
-                          "description",
-                          "industry",
-                          "contact.*",
-                          "employer.*",
-                          "employment_type",
-                          "experience.*",
-                          "location.*",
-                          "publisher.*",
-                          "responsibilities" ]
-              }
-            }
+            multi_match_query[:multi_match][:query] = @query
+
+            return multi_match_query
+          when @preference
+            multi_match_query[:multi_match][:query] = @preference
+
+            return { bool: { should: [ multi_match_query, match_all_definition ] } }
           else
-            { match_all: {} }
+            return match_all_definition
           end
         end
 

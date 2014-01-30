@@ -59,6 +59,21 @@ module Pickwick
                            "responsibilities" ], definition[:query][:function_score][:query][:multi_match][:fields]
           end
 
+          should "boost user preference if parameter is presented" do
+            definition = QueryBuilder.new(preference: 'microsoft').to_hash
+
+            assert_equal 'microsoft', definition[:query][:function_score][:query][:bool][:should].first[:multi_match][:query]
+            assert_not_nil definition[:query][:function_score][:query][:bool][:should].last[:match_all]
+          end
+
+          should "combine query and preference if presented" do
+            definition = QueryBuilder.new(query: 'programmer', preference: 'microsoft').to_hash
+
+            assert_equal "programmer", definition[:query][:function_score][:query][:bool][:must].first[:multi_match][:query]
+            assert_equal "microsoft",  definition[:query][:function_score][:query][:bool][:must].last[:bool][:should].first[:multi_match][:query]
+            assert_not_nil definition[:query][:function_score][:query][:bool][:must].last[:bool][:should].last[:match_all]
+          end
+
           should "calculate `from`, `size` attributes to get desired result page" do
             definition = QueryBuilder.new.to_hash
 
