@@ -3,7 +3,7 @@ module Pickwick
     module Models
       class QueryBuilder
 
-        attr_accessor :params, :definition, :page, :per_page
+        attr_accessor :params, :definition, :page, :per_page, :seed
 
         def initialize(params = {})
           @params          = params.symbolize_keys!

@@ -12,7 +12,7 @@ module Pickwick
             query     = QueryBuilder.new(params)
             vacancies = Vacancy.search(query.to_hash).records
 
-            Presenters::Search.new(vacancies).as_json
+            Presenters::Search.new(vacancies: vacancies, query: query, request: request).as_json
           end
         end
 
