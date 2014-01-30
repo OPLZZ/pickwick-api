@@ -31,6 +31,7 @@ class IntegrationTestCase < Test::Unit::TestCase
 
   def setup
     super
+    Elasticsearch::Model.client.transport.tracer = nil
 
     Consumer.index_name 'pickwick-api-consumers-test'
     Vacancy.index_name  'pickwick-api-vacancies-test'
