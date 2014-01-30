@@ -6,7 +6,7 @@ module Pickwick
         attr_accessor :params, :definition, :page, :per_page
 
         def initialize(params = {})
-          @params          = params
+          @params          = params.symbolize_keys!
           @definition      = {}
           @functions       = []
 
