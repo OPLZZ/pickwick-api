@@ -64,6 +64,7 @@ module Pickwick
         def __fulltext_query
           match_all_definition = { match_all: {} }
           multi_match_query    = { multi_match: {
+                                     operator: "AND",
                                      fields: [ "title",
                                                "description",
                                                "industry",
