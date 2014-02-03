@@ -33,14 +33,14 @@ module Pickwick
             definition = QueryBuilder.new(employment_type: 'part-time').to_hash
 
             assert_equal 'part-time', definition[:query][:function_score][:functions][0][:filter][:not][:term][:employment_type]
-            assert_equal -0.5,        definition[:query][:function_score][:functions][0][:boost_factor]
+            assert_equal -0.25,        definition[:query][:function_score][:functions][0][:boost_factor]
           end
 
           should "add remote when remote parameter is presented" do
             definition = QueryBuilder.new(remote: 'true').to_hash
 
             assert_equal true, definition[:query][:function_score][:functions][0][:filter][:not][:term][:remote]
-            assert_equal -0.5, definition[:query][:function_score][:functions][0][:boost_factor]
+            assert_equal -0.25, definition[:query][:function_score][:functions][0][:boost_factor]
           end
 
           should "search for user query when query parameter is presented" do

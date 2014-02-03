@@ -133,7 +133,7 @@ module Pickwick
             filter: {
               missing: { field: "location.coordinates" },
             },
-            boost_factor: -0.5
+            boost_factor: -1.25
           }
         end
 
@@ -145,7 +145,7 @@ module Pickwick
                 _cache: true
               }
             },
-            boost_factor: -0.5
+            boost_factor: -0.25
           }
         end
 
@@ -157,7 +157,7 @@ module Pickwick
                 _cache: true
               }
             },
-            boost_factor: -0.5
+            boost_factor: -0.25
           }
         end
 
@@ -171,6 +171,8 @@ module Pickwick
           }
         end
 
+        # TODO: Move to filter?
+        #
         def __add_expiration
           @functions << {
             filter: {
@@ -178,9 +180,9 @@ module Pickwick
                 expiration_date: {
                   lt: "now/d"
                 }
-              }
+              },
             },
-            boost_factor: -0.5
+            boost_factor: -0.25
           }
         end
 
