@@ -17,14 +17,60 @@ module Pickwick
         #
         index_name 'pickwick-api-vacancies'
 
-        settings index: { number_of_shards: 1 }
+        # TODO: add support for more languages
+        #
+        settings  index:    {
+                    number_of_shards: 1
+                  },
+                  analysis: {
+                    filter: {
+                      length_filter: {
+                        type: 'length',
+                        min:  2
+                      },
+                      shingle_filter: {
+                        type:             'shingle',
+                        max_shingle_size: 2,
+                        output_unigrams:  true
+                      },
+                      hunspell: {
+                        type:            'hunspell',
+                        locale:          'cs_CZ',
+                        dedup:           true,
+                        recursion_level: 0
+                      },
+                      remove_duplicities: {
+                        type:                  'unique',
+                        only_on_same_position: true
+                      },
+                      stopwords: {
+                        type:        'stop',
+                        stopwords:   [ '_czech_' ],
+                        ignore_case: true
+                      }
+                    },
+                    analyzer: {
+                      names: {
+                        type:      'custom',
+                        tokenizer: 'uax_url_email',
+                        filter:    [ 'stopwords', 'hunspell', 'lowercase', 'stopwords', 'length_filter', 'asciifolding', 'stopwords', 'remove_duplicities' ]
+                      },
+                      content: {
+                        type:      'custom',
+                        tokenizer: 'uax_url_email',
+                        filter:    [ 'stopwords', 'hunspell', 'lowercase', 'stopwords', 'length_filter', 'asciifolding', 'stopwords', 'shingle_filter', 'remove_duplicities' ]
+                      }
+                    }
+                  }
+
+        mapping _all: { enabled: false }
 
         property :id,                  String, accessor: :private, analyzer: 'keyword'
         property :consumer_id,         String, writer:   :private, analyzer: 'keyword'
-        property :title,               String
-        property :description,         String
+        property :title,               String, analyzer: 'content'
+        property :description,         String, analyzer: 'content'
         property :industry,            String, analyzer: 'keyword'
-        property :responsibilities,    String
+        property :responsibilities,    String, analyzer: 'content'
         property :number_of_positions, Integer
 
         property :employment_type,     String,  analyzer: 'keyword'

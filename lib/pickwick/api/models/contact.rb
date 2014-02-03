@@ -5,8 +5,8 @@ module Pickwick
       class Contact
         include Elasticsearch::Model::Persistence
 
-        property :email, String
-        property :name,  String
+        property :email, String, analyzer: 'names'
+        property :name,  String, analyzer: 'names'
         property :phone, String
 
         validate do

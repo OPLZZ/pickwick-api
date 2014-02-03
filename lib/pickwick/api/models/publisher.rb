@@ -5,8 +5,8 @@ module Pickwick
       class Publisher
         include Elasticsearch::Model::Persistence
 
-        property :name,    String
-        property :company, String
+        property :name,    String, analyzer: 'names'
+        property :company, String, analyzer: 'names'
       end
 
     end

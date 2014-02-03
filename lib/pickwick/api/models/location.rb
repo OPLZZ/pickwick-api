@@ -5,14 +5,14 @@ module Pickwick
       class Location
         include Elasticsearch::Model::Persistence
 
-        property :street,      String
-        property :city,        String
-        property :region,      String
+        property :street,      String, analyzer: 'names'
+        property :city,        String, analyzer: 'names'
+        property :region,      String, analyzer: 'names'
         property :zip,         String
 
         # TODO: Check country format
         #
-        property :country,     String
+        property :country,     String, analyzer: 'names'
         property :coordinates, Coordinates, type: 'geo_point'
       end
 
