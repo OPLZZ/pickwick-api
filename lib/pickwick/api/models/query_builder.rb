@@ -21,7 +21,9 @@ module Pickwick
         def __parse_params!
           @location        = params[:location]        || params[:l]
           @query           = params[:query]           || params[:q]
+          @query           = nil if @query.blank?
           @preference      = params[:preference]      || params[:p]
+          @preference      = nil if @preference.blank?
           @employment_type = params[:employment_type] || params[:type] || params[:t]
           @seed            = params[:seed]            || __generate_seed
 
@@ -44,15 +46,23 @@ module Pickwick
           __add_employment_type unless @employment_type.blank?
           __add_remote          unless @remote.blank?
           __add_start_date
-          __add_expiration
-          __add_random
+          __add_random          if @query.blank? && @preference.blank?
+          __add_score           unless @preference.blank?
 
           definition[:query] = {
             function_score: {
               query:      __fulltext_query,
               functions:  __scoring_functions,
-              score_mode: 'sum'
+              score_mode: 'avg',
+              boost_mode: 'replace'
             }
+          }
+
+          definition[:filter] = {
+            and: [
+              { range: { expiration_date: { gte: "now/d" } } },
+              { range: { start_date:      { gt:  "now-7d/d" } } }
+            ]
           }
 
           definition[:size] = @per_page
@@ -65,6 +75,7 @@ module Pickwick
           match_all_definition = { match_all: {} }
           multi_match_query    = { multi_match: {
                                      operator: "AND",
+                                     tie_breaker: 0.2,
                                      fields: [ "title",
                                                "description",
                                                "contact.*",
@@ -101,6 +112,14 @@ module Pickwick
           @functions
         end
 
+        def __add_score
+          @functions << {
+            script_score: {
+              script: "log(_score+1)"
+            }
+          }
+        end
+
         def __add_distance
           definition[:script_fields] = {
             distance: {
@@ -113,22 +132,26 @@ module Pickwick
 
         def __add_location
           @functions << {
-            gauss: {
+            exp: {
               :"location.coordinates" => {
                 origin: {
                   lat: @latitude,
                   lon: @longitude
                 },
-                scale: "50km"
+                scale: "300km",
+                decay: 0.1
               }
             }
           }
 
+          # NOTE: When location.coordinates are missing, previous decay function returns 1 for these documents,
+          #       so we need to subtract 1 to avoid boosting documents without GEO coordinates
+          #
           @functions << {
             filter: {
               missing: { field: "location.coordinates" },
             },
-            boost_factor: -1.25
+            boost_factor: -1
           }
         end
 
@@ -140,7 +163,7 @@ module Pickwick
                 _cache: true
               }
             },
-            boost_factor: -0.25
+            boost_factor: 0
           }
         end
 
@@ -152,38 +175,31 @@ module Pickwick
                 _cache: true
               }
             },
-            boost_factor: -0.25
+            boost_factor: 0
           }
         end
 
         def __add_start_date
           @functions << {
-            gauss: {
-              start_date: {
-                scale:  "30d"
-              }
-            }
-          }
-        end
-
-        # TODO: Move to filter?
-        #
-        def __add_expiration
-          @functions << {
             filter: {
               range: {
-                expiration_date: {
+                start_date: {
                   lt: "now/d"
                 }
               },
             },
-            boost_factor: -0.25
+            boost_factor: 0
           }
         end
 
         def __add_random
           @functions << {
-            random_score: { seed: @seed }
+            script_score: {
+              params: {
+                seed: @seed.to_i
+              },
+              script: "(abs(sin(doc['updated_at'].value + seed)) / 10) + 1"
+            }
           }
         end
 

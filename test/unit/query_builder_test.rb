@@ -10,17 +10,27 @@ module Pickwick
           should "generate 'blank' query" do
             definition = QueryBuilder.new.to_hash
 
-            assert_equal 'sum',   definition[:query][:function_score][:score_mode]
-            assert_equal '30d',   definition[:query][:function_score][:functions][0][:gauss][:start_date][:scale]
-            assert_equal 'now/d', definition[:query][:function_score][:functions][1][:filter][:range][:expiration_date][:lt]
-            assert_not_nil        definition[:query][:function_score][:functions][2][:random_score][:seed]
+            assert_equal 'now/d', definition[:query][:function_score][:functions][0][:filter][:range][:start_date][:lt]
+            assert_not_nil        definition[:query][:function_score][:functions][1][:script_score][:params][:seed]
+          end
+
+          should "filter out expired documents" do
+            definition = QueryBuilder.new.to_hash
+
+            assert_equal 'now/d', definition[:filter][:and].first[:range][:expiration_date][:gte]
+          end
+
+          should "filter out job positions which started more than week ago" do
+            definition = QueryBuilder.new.to_hash
+
+            assert_equal 'now-7d/d', definition[:filter][:and].last[:range][:start_date][:gt]
           end
 
           should "add geo function when location parameter is presented" do
             definition = QueryBuilder.new(location: '50.102648,14.44616').to_hash
 
-            assert_equal 50.102648, definition[:query][:function_score][:functions][0][:gauss][:'location.coordinates'][:origin][:lat]
-            assert_equal 14.44616,  definition[:query][:function_score][:functions][0][:gauss][:'location.coordinates'][:origin][:lon]
+            assert_equal 50.102648, definition[:query][:function_score][:functions][0][:exp][:'location.coordinates'][:origin][:lat]
+            assert_equal 14.44616,  definition[:query][:function_score][:functions][0][:exp][:'location.coordinates'][:origin][:lon]
           end
 
           should "add distance script field when location parameter is presented" do
@@ -33,14 +43,14 @@ module Pickwick
             definition = QueryBuilder.new(employment_type: 'part-time').to_hash
 
             assert_equal 'part-time', definition[:query][:function_score][:functions][0][:filter][:not][:term][:employment_type]
-            assert_equal -0.25,        definition[:query][:function_score][:functions][0][:boost_factor]
+            assert_equal 0,        definition[:query][:function_score][:functions][0][:boost_factor]
           end
 
           should "add remote when remote parameter is presented" do
             definition = QueryBuilder.new(remote: 'true').to_hash
 
             assert_equal true, definition[:query][:function_score][:functions][0][:filter][:not][:term][:remote]
-            assert_equal -0.25, definition[:query][:function_score][:functions][0][:boost_factor]
+            assert_equal 0, definition[:query][:function_score][:functions][0][:boost_factor]
           end
 
           should "search for user query when query parameter is presented" do
@@ -94,7 +104,7 @@ module Pickwick
           should "use same seed as in parameters" do
             definition = QueryBuilder.new(seed: 123).to_hash
 
-            assert_equal 123, definition[:query][:function_score][:functions][2][:random_score][:seed]
+            assert_equal 123, definition[:query][:function_score][:functions][1][:script_score][:params][:seed]
           end
 
           should "compose query from selected params" do
@@ -102,10 +112,8 @@ module Pickwick
 
             assert_not_nil             definition[:script_fields][:distance][:script]
             assert_equal true,         definition[:_source]
-            assert_equal 'sum',        definition[:query][:function_score][:score_mode]
             assert_equal 'programmer', definition[:query][:function_score][:query][:multi_match][:query]
-            assert_equal 123,          definition[:query][:function_score][:functions].last[:random_score][:seed]
-            assert_equal 6,            definition[:query][:function_score][:functions].size
+            assert_equal 4,            definition[:query][:function_score][:functions].size
           end
 
         end
