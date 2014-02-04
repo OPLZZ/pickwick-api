@@ -109,7 +109,7 @@ module Pickwick
         def __add_distance
           definition[:script_fields] = {
             distance: {
-              script: "(doc['location.coordinates'].value != null) ? doc['location.coordinates'].arcDistanceInKm(#{@location}) : null"
+              script: "(!doc['location.coordinates'].empty && doc['location.coordinates'].value != null) ? doc['location.coordinates'].arcDistanceInKm(#{@location}) : null"
             }
           }
 
