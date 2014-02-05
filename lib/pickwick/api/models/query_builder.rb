@@ -39,10 +39,10 @@ module Pickwick
         end
 
         def __build!
-          __add_distance        if @location
-          __add_location        if @location
-          __add_employment_type if @employment_type
-          __add_remote          if @remote
+          __add_distance        unless @location.blank?
+          __add_location        unless @location.blank?
+          __add_employment_type unless @employment_type.blank?
+          __add_remote          unless @remote.blank?
           __add_start_date
           __add_expiration
           __add_random
