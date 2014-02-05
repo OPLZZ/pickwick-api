@@ -11,6 +11,7 @@ module Pickwick
           begin
             block.call
           rescue Exception => e
+            puts e.message, e.backtrace.join("\n")
             error 500, json(error: e.class, description: e.message, backtrace: e.backtrace.first)
           end
         end
