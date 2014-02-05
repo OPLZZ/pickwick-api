@@ -63,6 +63,7 @@ module Pickwick
             definition = QueryBuilder.new(preference: 'microsoft').to_hash
 
             assert_equal 'microsoft', definition[:query][:function_score][:query][:bool][:should].first[:multi_match][:query]
+            assert_equal 'OR',        definition[:query][:function_score][:query][:bool][:should].first[:multi_match][:operator]
             assert_not_nil definition[:query][:function_score][:query][:bool][:should].last[:match_all]
           end
 
@@ -71,6 +72,7 @@ module Pickwick
 
             assert_equal "programmer", definition[:query][:function_score][:query][:bool][:must].first[:multi_match][:query]
             assert_equal "microsoft",  definition[:query][:function_score][:query][:bool][:must].last[:bool][:should].first[:multi_match][:query]
+            assert_equal 'OR',         definition[:query][:function_score][:query][:bool][:must].last[:bool][:should].first[:multi_match][:operator]
             assert_not_nil definition[:query][:function_score][:query][:bool][:must].last[:bool][:should].last[:match_all]
           end
 

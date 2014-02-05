@@ -78,10 +78,10 @@ module Pickwick
 
           case
           when @query && @preference
-            query            = multi_match_query.deep_merge(multi_match: { query: @query })
+            query            = multi_match_query.deep_merge(multi_match: { query: @query.strip })
             preference_query = { bool: {
                                         should: [
-                                          multi_match_query.deep_merge(multi_match: { query: @preference }),
+                                          multi_match_query.deep_merge(multi_match: { query: @preference.strip, operator: "OR" }),
                                           match_all_definition
                                         ],
                                         minimum_number_should_match: 1
@@ -90,13 +90,10 @@ module Pickwick
 
             return { bool: { must: [ query, preference_query ] } }
           when @query
-            multi_match_query[:multi_match][:query] = @query
-
-            return multi_match_query
+            return multi_match_query.deep_merge(multi_match: { query: @query.strip })
           when @preference
-            multi_match_query[:multi_match][:query] = @preference
-
-            return { bool: { should: [ multi_match_query, match_all_definition ] } }
+            return { bool: { should: [ multi_match_query.deep_merge(multi_match: { query: @preference.strip, operator: "OR" }),
+                                       match_all_definition ] } }
           else
             return match_all_definition
           end
