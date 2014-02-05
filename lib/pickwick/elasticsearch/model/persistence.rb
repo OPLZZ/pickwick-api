@@ -122,13 +122,13 @@ module Elasticsearch
                   @version   = response["_version"]
                   @persisted = true
                 end
-                response["ok"] ? self : false
+                response["_version"] ? self : false
               end
             else
               if response = __elasticsearch__.update_document
                 @version = response["_version"]
               end
-              response["ok"] ? self : false
+              response["_version"] ? self : false
             end
           end
         end
