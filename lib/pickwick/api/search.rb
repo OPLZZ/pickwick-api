@@ -6,7 +6,7 @@ module Pickwick
 
       in_application do
 
-        get "/vacancies", permission: :search do
+        get "/vacancies.?:format?", respond_to: :json, permission: :search do
           in_request do
 
             query     = QueryBuilder.new(params)
@@ -16,7 +16,7 @@ module Pickwick
           end
         end
 
-        get "/vacancies/:id", permission: :search do
+        get "/vacancies/:id.?:format?", respond_to: :json, permission: :search do
           in_request do
             vacancy = Vacancy.find(params[:id]).first
 
@@ -28,7 +28,7 @@ module Pickwick
           end
         end
 
-        post "/vacancies/bulk", permission: :search do
+        post "/vacancies/bulk.?:format?", respond_to: :json, permission: :search do
           in_request do
             vacancies = Vacancy.find(params[:ids])
 

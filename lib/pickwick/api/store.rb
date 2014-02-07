@@ -6,7 +6,7 @@ module Pickwick
 
       in_application do
 
-        post "/vacancies", permission: :store do
+        post "/vacancies.?:format?", respond_to: :json, permission: :store do
           in_request do
             payload = params[:payload].to_s.split("\n").map { |p| MultiJson.load(p, symbolize_keys: true) rescue nil }
 

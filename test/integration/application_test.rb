@@ -61,6 +61,17 @@ module Pickwick
           should "allow access for user with proper permission" do
             post '/vacancies', token: @store_consumer.token
             assert response.ok?
+            assert_equal "application/json;charset=utf-8", response.content_type
+          end
+
+          should "deny request with unknown type" do
+            post '/vacancies', {}, {'HTTP_ACCEPT' => 'text/html'}
+            assert_equal 406, response.status
+          end
+
+          should "deny request with unknown type defined by format parameter" do
+            post '/vacancies', format: :html
+            assert_equal 406, response.status
           end
 
           should "return error message if something goes wrong" do
@@ -115,6 +126,12 @@ module Pickwick
             assert response.ok?
             assert_equal 409,                  result[:status]
             assert_equal Vacancy::ERRORS[409], result[:errors][:base].first
+          end
+
+          should "return JSON by default" do
+            post "/vacancies", token: @store_consumer.token
+
+            assert_equal "application/json;charset=utf-8", response.headers["Content-Type"]
           end
 
           should "update already saved document" do
@@ -284,6 +301,12 @@ module Pickwick
             assert_nil   r[:vacancy][:consumer_id]
           end
 
+          should "return JSON by default" do
+            get "/vacancies/#{@vacancy.id}", token: @search_consumer.token
+
+            assert_equal "application/json;charset=utf-8", response.headers["Content-Type"]
+          end
+
           should "return 'not found' error if vacancy not found by id" do
             get "/vacancies/123", token: @search_consumer.token
 
@@ -306,6 +329,12 @@ module Pickwick
             assert_equal @vacancy.title, r[:vacancies].last[:title]
           end
 
+          should "return JSON by default (bulk)" do
+            post "/vacancies/bulk", ids: [@another_vacancy.id, @vacancy.id, '123'], token: @search_consumer.token
+
+            assert_equal "application/json;charset=utf-8", response.content_type
+          end
+
         end
 
         context "Searching for vacancies" do
@@ -323,6 +352,12 @@ module Pickwick
             assert_equal 10, r[:vacancies].size
             assert_not_nil   r[:vacancies].first[:title]
             assert_nil       r[:vacancies].first[:consumer_id]
+          end
+
+          should "return JSON by default" do
+            get "/vacancies", token: @search_consumer.token
+
+            assert_equal "application/json;charset=utf-8", response.headers["Content-Type"]
           end
 
         end
