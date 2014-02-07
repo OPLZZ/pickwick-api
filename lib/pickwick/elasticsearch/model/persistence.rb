@@ -150,6 +150,10 @@ module Elasticsearch
           !!@persisted && !destroyed?
         end
 
+        def fields
+          @fields ||= {}
+        end
+
         def __set_property(property, value)
           method = case
                    when self.respond_to?("#{property}=".to_sym)
