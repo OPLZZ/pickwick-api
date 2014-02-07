@@ -71,11 +71,9 @@ module Pickwick
                                      operator: "AND",
                                      fields: [ "title",
                                                "description",
-                                               "industry",
                                                "contact.*",
                                                "employer.*",
-                                               "employment_type",
-                                               "experience.*",
+                                               "experience.description",
                                                "location.*",
                                                "publisher.*",
                                                "responsibilities" ]} }

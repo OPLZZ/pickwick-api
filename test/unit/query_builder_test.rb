@@ -49,11 +49,9 @@ module Pickwick
             assert_equal 'programmer', definition[:query][:function_score][:query][:multi_match][:query]
             assert_equal [ "title",
                            "description",
-                           "industry",
                            "contact.*",
                            "employer.*",
-                           "employment_type",
-                           "experience.*",
+                           "experience.description",
                            "location.*",
                            "publisher.*",
                            "responsibilities" ], definition[:query][:function_score][:query][:multi_match][:fields]
