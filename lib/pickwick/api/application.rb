@@ -39,7 +39,13 @@ module Pickwick
 
       private
       def access_denied
-        halt 401, json(error: 'Access denied')
+        text = 'Access denied'
+
+        respond_with do
+          html { halt 401, text }
+          json { halt 401, json(error: text) }
+          jsld { halt 401, json(error: text) }
+        end
       end
 
     end
