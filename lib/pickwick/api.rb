@@ -14,7 +14,8 @@ require 'ruby-duration'
 require 'pickwick/elasticsearch/model/persistence'
 require 'pickwick/elasticsearch/model/adapters/persistence'
 
-require 'pickwick/api/helpers/respond_with'
+require 'pickwick/api/extensions/respond_with'
+
 require 'pickwick/api/helpers/common'
 
 require 'pickwick/api/presenters/search'
