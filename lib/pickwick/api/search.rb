@@ -12,6 +12,7 @@ module Pickwick
             query     = QueryBuilder.new(params)
             vacancies = Vacancy.search(query.to_hash).records
 
+            etag sha1(vacancies, query)
             Presenters::Search.new(vacancies: vacancies, query: query, request: request).as_json
           end
         end
@@ -20,6 +21,7 @@ module Pickwick
           in_request do
             vacancy = Vacancy.find(params[:id]).first
 
+            etag sha1(vacancy) if vacancy
             if vacancy
               json(vacancy: vacancy.public_properties)
             else
@@ -32,6 +34,7 @@ module Pickwick
           in_request do
             vacancies = Vacancy.find(params[:ids])
 
+            etag sha1(vacancies)
             json(vacancies: vacancies.map(&:public_properties))
           end
         end
