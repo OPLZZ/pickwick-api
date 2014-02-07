@@ -78,6 +78,10 @@ module Pickwick
           self.updated_at = Time.now.utc
         end
 
+        def sha1
+          Digest::SHA1.hexdigest(public_properties.except('score').to_json)
+        end
+
         private
 
         def __computed_id
