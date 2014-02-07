@@ -20,7 +20,6 @@ module Pickwick
 
           assert response.ok?
           assert_equal "Pickwick API",                  json(response.body)[:application]
-          assert_equal "\"#{Pickwick::API.revision}\"", response.headers["ETag"]
           assert_not_nil json(response.body)[:revision]
         end
 
@@ -308,18 +307,6 @@ module Pickwick
             assert_equal "application/json;charset=utf-8", response.headers["Content-Type"]
           end
 
-          should "return ETag when getting vacancy by id" do
-            Time.stubs(:now).returns(Time.at(1391595800))
-            vacancy = Vacancy.create title: 'Title',
-                                     description: 'Description',
-                                     contact:  { email: 'email@example.com' },
-                                     location: { city:  'Praha' }
-            Vacancy.__elasticsearch__.refresh_index!
-
-            get "/vacancies/#{vacancy.id}", token: @search_consumer.token
-            assert_equal "\"b9cc73270233ce62b4a306916e141b2bd419b4c6\"", response.headers["ETag"]
-          end
-
           should "return 'not found' error if vacancy not found by id" do
             get "/vacancies/123", token: @search_consumer.token
 
@@ -348,25 +335,6 @@ module Pickwick
             assert_equal "application/json;charset=utf-8", response.content_type
           end
 
-          should "calculate ETag for multiple vacancies" do
-            Time.stubs(:now).returns(Time.at(1391595800))
-            vacancy = Vacancy.create title: 'Title',
-                                     description: 'Description',
-                                     contact:  { email: 'email@example.com' },
-                                     location: { city:  'Praha' }
-
-            another_vacancy = Vacancy.create title: 'Another Title',
-                                             description: 'Another Description',
-                                             contact:  { email: 'mail@example.com' },
-                                             location: { city:  'Brno' }
-
-
-
-            post "/vacancies/bulk", ids: [another_vacancy.id, vacancy.id, '123'], token: @search_consumer.token
-
-            assert_equal "\"85819d991795ca59ea46ba9620182265dde70339\"", response.headers["ETag"]
-          end
-
         end
 
         context "Searching for vacancies" do
@@ -381,27 +349,10 @@ module Pickwick
             r = json(response.body)
 
             assert response.ok?
-            assert_not_nil response.headers["ETag"]
 
             assert_equal 10, r[:vacancies].size
             assert_not_nil   r[:vacancies].first[:title]
             assert_nil       r[:vacancies].first[:consumer_id]
-          end
-
-          should "calculate ETag based on response and query" do
-            Time.stubs(:now).returns(Time.at(1391595800))
-            v = Vacancy.new title:       "Ruby programmer",
-                            description: "Ruby On Rails",
-                            location:    { country: "Czech Republic" },
-                            contact:     { email:   "email@example.com" }
-
-            v.set_id "123"
-            v.save
-            Vacancy.__elasticsearch__.refresh_index!
-
-            get "/vacancies", token: @search_consumer.token, query: 'Ruby On Rails', seed: 123
-
-            assert_equal "\"8e0fcd9377d37c1082312b5105d8b59a91e4f4d7\"", response.headers["ETag"]
           end
 
           should "return JSON by default" do

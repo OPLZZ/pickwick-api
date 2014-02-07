@@ -18,10 +18,6 @@ module Pickwick
           definition
         end
 
-        def sha1
-          Digest::SHA1.hexdigest(to_hash.to_json)
-        end
-
         def __parse_params!
           @location        = params[:location]        || params[:l]
           @query           = params[:query]           || params[:q]

@@ -7,11 +7,6 @@ module Pickwick
           MultiJson.dump value, indent: 2
         end
 
-        def sha1(*values)
-          values = Array(values).flatten
-          Digest::SHA1.hexdigest(values.map { |value| value.respond_to?(:sha1) ? value.sha1 : value }.join(","))
-        end
-
         def in_request(&block)
           begin
             block.call

@@ -24,11 +24,9 @@ module Pickwick
 
       before do
         headers( "Access-Control-Allow-Origin" => "*" )
-        cache_control :public
       end
 
       get '/' do
-        etag Pickwick::API.revision
         respond_with do
           html { erb  :readme }
           json { json(application: 'Pickwick API', revision: Pickwick::API.revision) }
