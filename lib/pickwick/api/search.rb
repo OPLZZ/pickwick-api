@@ -23,7 +23,7 @@ module Pickwick
             if vacancy
               json(vacancy: vacancy.public_properties)
             else
-              halt 404, json(error: 'Not found')
+              halt 404, json(error: Vacancy::ERRORS[404])
             end
           end
         end

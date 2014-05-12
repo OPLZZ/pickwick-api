@@ -19,7 +19,7 @@ module Pickwick
           get '/'
 
           assert response.ok?
-          assert_equal "Pickwick API",                  json(response.body)[:application]
+          assert_equal "Pickwick API", json(response.body)[:application]
           assert_not_nil json(response.body)[:revision]
         end
 
@@ -313,7 +313,7 @@ module Pickwick
             r = json(response.body)
 
             assert_equal 404,         response.status
-            assert_equal "Not found", r[:error]
+            assert_equal Vacancy::ERRORS[404], r[:error]
           end
 
           should "return vacancies by multiple ids (by calling bulk endpoint)" do
