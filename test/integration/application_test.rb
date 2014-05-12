@@ -34,6 +34,71 @@ module Pickwick
 
       end
 
+      context "Delete" do
+        setup do
+          @store_consumer          = FactoryGirl.create(:store_consumer)
+          @another_store_consumer  = FactoryGirl.create(:store_consumer)
+          @search_consumer         = FactoryGirl.create(:search_consumer)
+          @vacancy                 = FactoryGirl.create(:vacancy, consumer_id: @store_consumer.token)
+
+          Consumer.__elasticsearch__.refresh_index!
+          Vacancy.__elasticsearch__.refresh_index!
+        end
+
+        context "Credentials" do
+
+          should "deny access without valid token" do
+            delete "/vacancies/#{@vacancy.id}"
+
+            assert_equal 401, response.status
+            assert_equal "Access denied", json(response.body)[:error]
+          end
+
+          should "deny access for user without `store` permission" do
+            delete "/vacancies/#{@vacancy.id}", token: @search_consumer.token
+
+            assert_equal 401, response.status
+            assert_equal "Access denied", json(response.body)[:error]
+          end
+
+        end
+
+        context "Deleting vacancy offer" do
+
+          should "return 404 when vacancy is not found" do
+            delete "/vacancies/123", token: @store_consumer.token
+            Vacancy.__elasticsearch__.refresh_index!
+
+            assert_equal 404, response.status
+
+            r = json(response.body)
+            assert_equal Vacancy::ERRORS[404], r[:error]
+            assert_not_nil Vacancy.find(@vacancy.id).first
+          end
+
+          should "not delete vacancy from different API consumer" do
+            delete "/vacancies/#{@vacancy.id}", token: @another_store_consumer.token
+            Vacancy.__elasticsearch__.refresh_index!
+
+            r = json(response.body)
+
+            assert_equal 403, response.status
+            assert_equal Vacancy::ERRORS[403], r[:error]
+            assert_not_nil Vacancy.find(@vacancy.id).first
+          end
+
+          should "delete consumer's vacancy" do
+            delete "/vacancies/#{@vacancy.id}", token: @store_consumer.token
+            Vacancy.__elasticsearch__.refresh_index!
+
+            assert_equal 204, response.status
+            assert_nil Vacancy.find(@vacancy.id).first
+          end
+
+        end
+
+      end
+
       context "Store" do
 
         setup do

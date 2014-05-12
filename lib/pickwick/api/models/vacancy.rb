@@ -8,6 +8,7 @@ module Pickwick
         DEFAULT_EXPIRATION = 30.days
         TYPES              = ['full-time', 'part-time', 'contract', 'temporary', 'seasonal', 'internship']
         ERRORS             = { 409 => 'similar document was already created by another API consumer',
+                               403 => 'forbidden',
                                404 => 'requested document was not found' }
 
         before_save :set_updated_at

@@ -6,6 +6,21 @@ module Pickwick
 
       in_application do
 
+        delete "/vacancies/:id.?:format?", respond_to: :json, permission: :store do
+          in_request do
+            vacancy = Vacancy.find(params[:id]).first
+
+            if vacancy
+              halt 403, json(error: Vacancy::ERRORS[403]) if vacancy.consumer_id != @consumer.token
+
+              vacancy.destroy
+              status 204
+            else
+              halt 404, json(error: Vacancy::ERRORS[404])
+            end
+          end
+        end
+
         post "/vacancies.?:format?", respond_to: :json, permission: :store do
           in_request do
             payload = params[:payload].to_s.split("\n").map { |p| MultiJson.load(p, symbolize_keys: true) rescue nil }
