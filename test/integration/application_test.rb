@@ -39,7 +39,7 @@ module Pickwick
           @store_consumer          = FactoryGirl.create(:store_consumer)
           @another_store_consumer  = FactoryGirl.create(:store_consumer)
           @search_consumer         = FactoryGirl.create(:search_consumer)
-          @vacancy                 = FactoryGirl.create(:vacancy, consumer_id: @store_consumer.token)
+          @vacancy                 = FactoryGirl.create(:vacancy, consumer_id: @store_consumer.id)
 
           Consumer.__elasticsearch__.refresh_index!
           Vacancy.__elasticsearch__.refresh_index!

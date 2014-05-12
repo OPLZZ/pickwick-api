@@ -11,7 +11,7 @@ module Pickwick
             vacancy = Vacancy.find(params[:id]).first
 
             if vacancy
-              halt 403, json(error: Vacancy::ERRORS[403]) if vacancy.consumer_id != @consumer.token
+              halt 403, json(error: Vacancy::ERRORS[403]) if vacancy.consumer_id != @consumer.id
 
               vacancy.destroy
               status 204
