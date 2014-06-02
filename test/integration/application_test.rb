@@ -12,7 +12,7 @@ module Pickwick
           get '/'
 
           assert last_response.ok?
-          assert last_response.body.include?(RDiscount.new(File.read( File.join(app.settings.root, '..', '..', '..', 'README.md') )).to_html)
+          assert last_response.body.include?(RDiscount.new(File.read( File.join(app.settings.root, '..', '..', '..', 'README.markdown') )).to_html)
         end
 
         should "get application revision in JSON by default" do
@@ -377,7 +377,7 @@ module Pickwick
 
             r = json(response.body)
 
-            assert_equal 404,         response.status
+            assert_equal 404,                  response.status
             assert_equal Vacancy::ERRORS[404], r[:error]
           end
 
